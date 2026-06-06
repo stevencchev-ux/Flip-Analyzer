@@ -444,85 +444,50 @@ async function lookupProperty(){
   try{
     const encodedAddr=encodeURIComponent(addr);
 
-    // Step 1 — use propertyExtendedSearch to find zpid for the address
-    // Pass full address as location — it searches Zillow and returns matching listings
-    const locParam=encodeURIComponent(addr);
-    const extRes=await fetch(`${BASE}/propertyExtendedSearch?location=${locParam}&home_type=Houses&beds_min=1`,{headers:apiHeaders()});
+    // Step 1 — extended search to find zpid
+    const extRes=await fetch(`${BASE}/propertyExtendedSearch?location=${encodedAddr}&home_type=Houses&beds_min=1`,{headers:apiHeaders()});
     const extData=await extRes.json();
-
-    // API returns array directly OR object with props key
-    const allProps=Array.isArray(extData)?extData:(extData.props||extData.results||[]);
-    console.log('EXT total props:', allProps.length);
-    console.log('EXT props[0]:', JSON.stringify(allProps[0]||{}).slice(0,600));
-
-    // Match property by street number
+    const allProps=Array.isArray(extData)?extData:(extData.props||[]);
     const streetNum=(addr.match(/^\d+/)||[])[0]||'';
-    const matched=allProps.find(p=>{
-      const a=(p.address||p.streetAddress||'').toLowerCase();
-      return streetNum&&a.startsWith(streetNum.toLowerCase());
-    })||allProps[0]||null;
-
+    const matched=allProps.find(p=>(p.address||'').toLowerCase().startsWith(streetNum.toLowerCase()))||allProps[0]||null;
     const zpid=matched?.zpid||null;
-    console.log('MATCHED zpid:', zpid, 'address:', matched?.address);
 
-    let beds=null,bathsRaw=null,sqft=null,yearBuilt=null,lastSoldPrice=null,lastSoldDate=null;
-
-    if(zpid){
-      // Step 2 — fetch full property details using zpid
-      const propRes=await fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()});
-      const propData=await propRes.json();
-      // priceHistory has accurate last sold data
-      const soldEvents=(propData.priceHistory||[]).filter(e=>
-        (e.event||'').toLowerCase()==='sold'
-      );
-      const lastSold=soldEvents[0]||null;
-      lastSoldPrice=lastSold?.price||null;
-      lastSoldDate=lastSold?.date||null;
-
-      // yearBuilt from nearbyHomes if not on main record
-      yearBuilt=propData.yearBuilt||null;
-
-      // zestimate is reliable — use as ARV fallback
-      const zestimate=propData.zestimate||null;
-
-      // beds/baths/sqft — the /property endpoint returns rental listing data
-      // for this address. Use nearbyHomes to find the closest match by
-      // street number for actual property details
-      const nearby=propData.nearbyHomes||[];
-      const sn=parseInt((addr.match(/^\d+/)||[0])[0])||0;
-      // Find nearby home with closest street number
-      const nearMatch=nearby.reduce((best,h)=>{
-        const hNum=parseInt((h.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
-        if(!hNum) return best;
-        if(!best) return h;
-        const bNum=parseInt((best.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
-        return Math.abs(hNum-sn)<Math.abs(bNum-sn)?h:best;
-      },null);
-
-      // Use nearby match for beds/baths/sqft/yearBuilt as proxy
-      // (better than rental listing data)
-      beds=nearMatch?.bedrooms||propData.bedrooms||null;
-      bathsRaw=nearMatch?.bathrooms||propData.bathrooms||null;
-      sqft=nearMatch?.livingArea||propData.livingArea||null;
-      if(!yearBuilt) yearBuilt=nearMatch?.yearBuilt||null;
-
-      // Override ARV with zestimate if value estimate didn't return data
-      if(!arvMed&&zestimate) {
-        // arvMed already set from valueEstimate call above — only use zestimate as fallback
-      }
-    }
-
-    // Fetch comps and value estimate in parallel with property lookup
-    // (already have zpid so fire these while property details load)
-    const [compsRes2, valueRes2]=await Promise.all([
+    // Step 2 — fetch property details + comps + value estimate in parallel
+    const calls=[
       fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
       fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
-    ]);
-    const compsData=await compsRes2.json();
-    const valueData2=await valueRes2.json();
-    const arvLow=valueData2.lowValue||null;
-    const arvMed=valueData2.median||propData.zestimate||null;
-    const arvHigh=valueData2.highValue||null;
+    ];
+    if(zpid) calls.push(fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()}));
+
+    const results=await Promise.all(calls);
+    const compsData=await results[0].json();
+    const valueData=await results[1].json();
+    const propData=zpid?(await results[2].json()):null;
+
+    // Value estimate
+    const arvLow=valueData.lowValue||null;
+    const arvMed=valueData.median||propData?.zestimate||null;
+    const arvHigh=valueData.highValue||null;
+
+    // Last sold from priceHistory
+    const soldEvents=(propData?.priceHistory||[]).filter(e=>(e.event||'').toLowerCase()==='sold');
+    const lastSold=soldEvents[0]||null;
+    const lastSoldPrice=lastSold?.price||null;
+    const lastSoldDate=lastSold?.date||null;
+    const yearBuilt=propData?.yearBuilt||null;
+
+    // beds/baths/sqft — use nearbyHomes closest match since property may be a rental listing
+    const nearby=propData?.nearbyHomes||[];
+    const sn=parseInt(streetNum)||0;
+    const nearMatch=nearby.reduce((best,h)=>{
+      if(!best) return h;
+      const hN=parseInt((h.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
+      const bN=parseInt((best.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
+      return Math.abs(hN-sn)<Math.abs(bN-sn)?h:best;
+    },null);
+    const beds=nearMatch?.bedrooms||propData?.bedrooms||null;
+    const bathsRaw=nearMatch?.bathrooms||propData?.bathrooms||null;
+    const sqft=nearMatch?.livingArea||propData?.livingArea||null;
 
     // --- Auto-fill deal inputs ---
     let filled=[];
@@ -560,15 +525,14 @@ async function lookupProperty(){
     el('pp-arv-med').textContent=arvMed?fc(arvMed):'—';
     el('pp-arv-high').textContent=arvHigh?fc(arvHigh):'—';
 
-    // Comps rows
     const comps=(compsData.comps||[]).slice(0,5);
     const compsHtml=comps.length?comps.map((c,i)=>{
       const price=fc(c.price||c.lastSoldPrice);
-      const status=(c.homeStatus||c.status||'').toLowerCase().replace(/_/g,' ');
-      const isSold=status.includes('sold');
-      const statusLabel=status?status.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
-      const street=c.address?.streetAddress||c.streetAddress||'N/A';
-      const city=c.address?.city||c.city||'';
+      const status2=(c.homeStatus||c.status||'').toLowerCase().replace(/_/g,' ');
+      const isSold=status2.includes('sold');
+      const statusLabel=status2?status2.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
+      const street=c.address?.streetAddress||'N/A';
+      const city=c.address?.city||'';
       const shortAddr=street+(city?', '+city:'');
       const bd=c.bedrooms||'?'; const ba=c.bathrooms||'?';
       const sf=c.livingArea?fn(c.livingArea)+' sf':'';
@@ -586,12 +550,12 @@ async function lookupProperty(){
       status.textContent=`Auto-filled: ${filled.join(', ')} — review and adjust before running analysis.`;
       status.className='lookup-status status-ok';
     } else {
-      status.textContent='Property found — no detail data to auto-fill. Enter manually.';
+      status.textContent='Property found — fill in details manually.';
       status.className='lookup-status status-err';
     }
 
   }catch(e){
-    console.error(e);
+    console.error('Lookup error:',e);
     status.textContent='Lookup failed — check your connection or fill in manually.';
     status.className='lookup-status status-err';
   }
