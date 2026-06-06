@@ -63,6 +63,31 @@
   .status-err { color: var(--danger); }
   .autofilled { border-color: #40c080 !important; }
 
+  /* Property profile card */
+  #profile-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+  .profile-top { display: grid; grid-template-columns: repeat(5,1fr); gap: 1rem; margin-bottom: 1.25rem; }
+  .profile-stat { display: flex; flex-direction: column; gap: 3px; }
+  .profile-stat .ps-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); }
+  .profile-stat .ps-value { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--text); }
+  .profile-stat .ps-sub { font-size: 11px; color: var(--muted); }
+  .arv-range { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
+  .arv-low { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .arv-med { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--accent); }
+  .arv-high { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .arv-sep { color: var(--hint); font-size: 10px; margin: 0 1px; }
+  .profile-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 1rem; }
+  .comps-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hint); margin-bottom: 10px; }
+  .comp-row { display: grid; grid-template-columns: 16px auto 1fr auto; align-items: baseline; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .comp-row:last-child { border-bottom: none; }
+  .comp-num { font-family: var(--font-mono); font-size: 10px; color: var(--hint); }
+  .comp-badge { font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 3px; border: 1px solid; white-space: nowrap; }
+  .cb-sold { background: #0a1a10; color: #40c080; border-color: #1e4030; }
+  .cb-other { background: var(--surface2); color: var(--muted); border-color: var(--border2); }
+  .comp-left { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .comp-price { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .comp-addr { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .comp-details { font-family: var(--font-mono); font-size: 11px; color: var(--hint); white-space: nowrap; text-align: right; }
+
   .toggle-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
   .toggle-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 12px; }
   .toggle-item:last-child { border-bottom: none; }
@@ -157,6 +182,7 @@
     .toggle-list { grid-template-columns: 1fr; }
     .action-bar { flex-direction: column; align-items: stretch; }
     .lookup-row { flex-direction: column; }
+    .profile-top { grid-template-columns: 1fr 1fr; }
     .log-table th:nth-child(4), .log-table td:nth-child(4),
     .log-table th:nth-child(5), .log-table td:nth-child(5) { display: none; }
   }
@@ -200,6 +226,44 @@
       <button class="lookup-btn" id="lookup-btn" onclick="lookupProperty()" disabled>Look up</button>
     </div>
     <div class="lookup-status" id="lookup-status"></div>
+  </div>
+
+  <!-- PROPERTY PROFILE -->
+  <div id="profile-card">
+    <div class="card-title" id="profile-address-title">Property profile</div>
+    <div class="profile-top">
+      <div class="profile-stat">
+        <span class="ps-label">Beds / Baths</span>
+        <span class="ps-value" id="pp-bedbath">—</span>
+      </div>
+      <div class="profile-stat">
+        <span class="ps-label">Sqft</span>
+        <span class="ps-value" id="pp-sqft">—</span>
+      </div>
+      <div class="profile-stat">
+        <span class="ps-label">Year built</span>
+        <span class="ps-value" id="pp-year">—</span>
+      </div>
+      <div class="profile-stat">
+        <span class="ps-label">Last sold</span>
+        <span class="ps-value" id="pp-lastsold">—</span>
+        <span class="ps-sub" id="pp-lastdate"></span>
+      </div>
+      <div class="profile-stat">
+        <span class="ps-label">ARV estimate</span>
+        <div class="arv-range">
+          <span class="arv-low" id="pp-arv-low">—</span>
+          <span class="arv-sep">›</span>
+          <span class="arv-med" id="pp-arv-med">—</span>
+          <span class="arv-sep">›</span>
+          <span class="arv-high" id="pp-arv-high">—</span>
+        </div>
+        <span class="ps-sub">low · median · high</span>
+      </div>
+    </div>
+    <hr class="profile-divider">
+    <div class="comps-title">Nearby comps — 4 mi radius</div>
+    <div id="pp-comps"></div>
   </div>
 
   <!-- DEAL INPUTS -->
@@ -382,12 +446,11 @@ async function lookupProperty(){
   btn.disabled=true; btn.textContent='Looking up…';
   status.textContent='Fetching property data…';
   status.className='lookup-status status-loading';
+  document.getElementById('profile-card').style.display='none';
 
   try{
     const encodedAddr=encodeURIComponent(addr);
 
-    // Fire propertyComps (beds/baths/sqft from subject property) and
-    // valueEstimate (median ARV) in parallel — same pattern as your Azure function
     const [compsRes, valueRes]=await Promise.all([
       fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
       fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
@@ -396,20 +459,25 @@ async function lookupProperty(){
     const compsData=await compsRes.json();
     const valueData=await valueRes.json();
 
-    // propertyComps returns a subject property object + comps array
-    // subject property is the first entry or a top-level object
-    const subject=compsData.subject||compsData.property||
-      (compsData.comps&&compsData.comps[0])||compsData;
+    console.log('COMPS:', JSON.stringify(compsData).slice(0,600));
+    console.log('VALUE:', JSON.stringify(valueData).slice(0,400));
 
-    const beds=subject.bedrooms||null;
-    const bathsRaw=subject.bathrooms||null;
-    const sqft=subject.livingArea||null;
+    // Subject property
+    const subject=compsData.subject||compsData.property||compsData.subjectProperty||null;
+    const beds=subject?.bedrooms||compsData.bedrooms||null;
+    const bathsRaw=subject?.bathrooms||compsData.bathrooms||null;
+    const sqft=subject?.livingArea||compsData.livingArea||null;
+    const yearBuilt=subject?.yearBuilt||compsData.yearBuilt||null;
+    const lastSoldPrice=subject?.lastSoldPrice||subject?.price||compsData.lastSoldPrice||null;
+    const lastSoldDate=subject?.lastSoldDate||subject?.dateSold||compsData.lastSoldDate||null;
 
-    // valueEstimate returns median — same fields your Azure code uses
-    const arvValue=valueData.median||valueData.highValue||valueData.lowValue||null;
+    // Value estimate
+    const arvLow=valueData.lowValue||null;
+    const arvMed=valueData.median||null;
+    const arvHigh=valueData.highValue||null;
 
+    // --- Auto-fill deal inputs ---
     let filled=[];
-
     if(beds){
       const bedSel=document.getElementById('beds');
       const opt=[...bedSel.options].find(o=>+o.value===Math.round(beds))||
@@ -425,28 +493,57 @@ async function lookupProperty(){
       if(opt){bathSel.value=opt.value;markFilled('baths');}
       filled.push('baths');
     }
-    if(sqft){
-      document.getElementById('sqft').value=Math.round(sqft);
-      markFilled('sqft');
-      filled.push('sqft');
-    }
-    if(arvValue){
-      document.getElementById('arv').value=Math.round(arvValue);
-      markFilled('arv');
-      filled.push('ARV (median estimate)');
-    }
-
+    if(sqft){document.getElementById('sqft').value=Math.round(sqft);markFilled('sqft');filled.push('sqft');}
+    if(arvMed){document.getElementById('arv').value=Math.round(arvMed);markFilled('arv');filled.push('ARV');}
     document.getElementById('save-address').value=addr;
+
+    // --- Populate profile card ---
+    const fc=n=>n?('$'+Math.round(n).toLocaleString()):'N/A';
+    const fn=n=>n?Math.round(n).toLocaleString():'N/A';
+    const el=id=>document.getElementById(id);
+
+    el('profile-address-title').textContent=addr;
+    el('pp-bedbath').textContent=(beds&&bathsRaw)?(Math.round(beds)+'bd / '+bathsRaw+'ba'):(beds?Math.round(beds)+'bd':'N/A');
+    el('pp-sqft').textContent=sqft?fn(sqft)+' sqft':'N/A';
+    el('pp-year').textContent=yearBuilt||'N/A';
+    el('pp-lastsold').textContent=lastSoldPrice?fc(lastSoldPrice):'N/A';
+    el('pp-lastdate').textContent=lastSoldDate||'';
+    el('pp-arv-low').textContent=arvLow?fc(arvLow):'—';
+    el('pp-arv-med').textContent=arvMed?fc(arvMed):'—';
+    el('pp-arv-high').textContent=arvHigh?fc(arvHigh):'—';
+
+    // Comps rows
+    const comps=(compsData.comps||[]).slice(0,5);
+    const compsHtml=comps.length?comps.map((c,i)=>{
+      const price=fc(c.price||c.lastSoldPrice);
+      const status=(c.homeStatus||c.status||'').toLowerCase().replace(/_/g,' ');
+      const isSold=status.includes('sold');
+      const statusLabel=status?status.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
+      const street=c.address?.streetAddress||c.streetAddress||'N/A';
+      const city=c.address?.city||c.city||'';
+      const shortAddr=street+(city?', '+city:'');
+      const bd=c.bedrooms||'?'; const ba=c.bathrooms||'?';
+      const sf=c.livingArea?fn(c.livingArea)+' sf':'';
+      return `<div class="comp-row">
+        <span class="comp-num">${i+1}</span>
+        <span class="comp-badge ${isSold?'cb-sold':'cb-other'}">${statusLabel}</span>
+        <span class="comp-left"><span class="comp-price">${price}</span><span class="comp-addr">${shortAddr}</span></span>
+        <span class="comp-details">${bd}/${ba}${sf?' · '+sf:''}</span>
+      </div>`;
+    }).join(''):'<div style="font-size:13px;color:var(--hint);padding:8px 0">No comps returned.</div>';
+    el('pp-comps').innerHTML=compsHtml;
+    el('profile-card').style.display='block';
 
     if(filled.length){
       status.textContent=`Auto-filled: ${filled.join(', ')} — review and adjust before running analysis.`;
       status.className='lookup-status status-ok';
     } else {
-      status.textContent='Property found but no details returned — fill in manually.';
+      status.textContent='Property found — no detail data to auto-fill. Enter manually.';
       status.className='lookup-status status-err';
     }
 
   }catch(e){
+    console.error(e);
     status.textContent='Lookup failed — check your connection or fill in manually.';
     status.className='lookup-status status-err';
   }
