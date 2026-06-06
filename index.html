@@ -330,7 +330,6 @@ const C=1.10;
 const LOG_KEY='flip_analyzer_log';
 let lastResult=null;
 let suggestTimeout=null;
-let selectedZpid=null;
 
 function fmt(n){return'$'+Math.round(n).toLocaleString()}
 function pct(n){return(Math.round(n*10)/10)+'%'}
@@ -379,64 +378,50 @@ document.addEventListener('click',e=>{
 async function lookupProperty(){
   const status=document.getElementById('lookup-status');
   const btn=document.getElementById('lookup-btn');
-  btn.disabled=true;
-  btn.textContent='Looking up…';
+  const addr=document.getElementById('addr-input').value.trim();
+  btn.disabled=true; btn.textContent='Looking up…';
+  status.textContent='Fetching property data…';
+  status.className='lookup-status status-loading';
 
   try{
-    let zpid=selectedZpid;
+    const encodedAddr=encodeURIComponent(addr);
 
-    // If no zpid from suggestions, try extended search
-    if(!zpid){
-      status.textContent='Searching for property…';
-      status.className='lookup-status status-loading';
-      const addr=document.getElementById('addr-input').value.trim();
-      const parts=addr.split(',');
-      const street=parts[0]?.trim()||'';
-      const city=parts[1]?.trim()||'Long Beach';
-      const stateZip=(parts[2]||'CA').trim();
-      const state=stateZip.replace(/\d+/g,'').trim()||'CA';
-      const r=await fetch(`${BASE}/propertyExtendedSearch?location=${encodeURIComponent(city+' '+state)}&home_type=Houses`,{headers:apiHeaders()});
-      const d=await r.json();
-      const props=d.props||[];
-      const match=props.find(p=>p.address&&p.address.toLowerCase().includes(street.toLowerCase()));
-      if(match) zpid=match.zpid;
-    }
-
-    if(!zpid){
-      status.textContent='Property not found. Please fill in details manually.';
-      status.className='lookup-status status-err';
-      btn.textContent='Look up'; btn.disabled=false; return;
-    }
-
-    // Fetch property details + zestimate in parallel
-    status.textContent='Fetching property details…';
-    status.className='lookup-status status-loading';
-
-    const [propRes, zestRes]=await Promise.all([
-      fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()}),
-      fetch(`${BASE}/zestimate?zpid=${zpid}`,{headers:apiHeaders()})
+    // Fire propertyComps (beds/baths/sqft from subject property) and
+    // valueEstimate (median ARV) in parallel — same pattern as your Azure function
+    const [compsRes, valueRes]=await Promise.all([
+      fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
+      fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
     ]);
-    const prop=await propRes.json();
-    const zest=await zestRes.json();
 
-    // Extract fields
-    const beds=prop.bedrooms||prop.beds||null;
-    const bathsRaw=prop.bathrooms||prop.baths||null;
-    const sqft=prop.livingArea||prop.sqft||prop.lotSize||null;
-    const zestimate=zest.zestimate||zest.amount||prop.zestimate||null;
+    const compsData=await compsRes.json();
+    const valueData=await valueRes.json();
+
+    // propertyComps returns a subject property object + comps array
+    // subject property is the first entry or a top-level object
+    const subject=compsData.subject||compsData.property||
+      (compsData.comps&&compsData.comps[0])||compsData;
+
+    const beds=subject.bedrooms||null;
+    const bathsRaw=subject.bathrooms||null;
+    const sqft=subject.livingArea||null;
+
+    // valueEstimate returns median — same fields your Azure code uses
+    const arvValue=valueData.median||valueData.highValue||valueData.lowValue||null;
 
     let filled=[];
 
     if(beds){
       const bedSel=document.getElementById('beds');
-      const opt=[...bedSel.options].find(o=>+o.value===Math.round(beds));
+      const opt=[...bedSel.options].find(o=>+o.value===Math.round(beds))||
+        [...bedSel.options].reduce((a,c)=>Math.abs(+c.value-beds)<Math.abs(+a.value-beds)?c:a);
       if(opt){bedSel.value=opt.value;markFilled('beds');}
       filled.push('beds');
     }
     if(bathsRaw){
       const b=bathsRaw%1>=0.5?Math.floor(bathsRaw)+0.5:Math.floor(bathsRaw);
       const bathSel=document.getElementById('baths');
-      const opt=[...bathSel.options].find(o=>+o.value===b)||[...bathSel.options].reduce((a,c)=>Math.abs(+c.value-b)<Math.abs(+a.value-b)?c:a);
+      const opt=[...bathSel.options].find(o=>+o.value===b)||
+        [...bathSel.options].reduce((a,c)=>Math.abs(+c.value-b)<Math.abs(+a.value-b)?c:a);
       if(opt){bathSel.value=opt.value;markFilled('baths');}
       filled.push('baths');
     }
@@ -445,20 +430,19 @@ async function lookupProperty(){
       markFilled('sqft');
       filled.push('sqft');
     }
-    if(zestimate){
-      document.getElementById('arv').value=Math.round(zestimate);
+    if(arvValue){
+      document.getElementById('arv').value=Math.round(arvValue);
       markFilled('arv');
-      filled.push('arv (Zestimate)');
+      filled.push('ARV (median estimate)');
     }
 
-    // Pre-fill save address
-    document.getElementById('save-address').value=document.getElementById('addr-input').value;
+    document.getElementById('save-address').value=addr;
 
     if(filled.length){
       status.textContent=`Auto-filled: ${filled.join(', ')} — review and adjust before running analysis.`;
       status.className='lookup-status status-ok';
     } else {
-      status.textContent='Property found but no detail data returned. Fill in manually.';
+      status.textContent='Property found but no details returned — fill in manually.';
       status.className='lookup-status status-err';
     }
 
