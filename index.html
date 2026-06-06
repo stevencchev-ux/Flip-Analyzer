@@ -444,28 +444,36 @@ async function lookupProperty(){
   try{
     const encodedAddr=encodeURIComponent(addr);
 
-    const [compsRes, valueRes]=await Promise.all([
+    // Fire all three in parallel:
+    // 1) propertyExtendedSearch — address search returns subject property details
+    // 2) propertyComps — nearby sold comps
+    // 3) valueEstimate — ARV range
+    const searchParams=new URLSearchParams({location:addr,home_type:'Houses'});
+    const [searchRes, compsRes, valueRes]=await Promise.all([
+      fetch(`${BASE}/propertyExtendedSearch?${searchParams}`,{headers:apiHeaders()}),
       fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
       fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
     ]);
 
+    const searchData=await searchRes.json();
     const compsData=await compsRes.json();
     const valueData=await valueRes.json();
 
-    // No subject key — comps array only. Find the comp whose address
-    // most closely matches the queried address (street number match),
-    // otherwise fall back to the first comp as the best proxy.
-    const compsArr=compsData.comps||[];
-    const addrLower=addr.toLowerCase();
-    const streetNum=(addrLower.match(/^\d+/)||[])[0]||'';
-    const subject=compsArr.find(c=>{
-      const cs=(c.address?.streetAddress||'').toLowerCase();
-      return streetNum&&cs.startsWith(streetNum);
-    })||compsArr[0]||null;
+    console.log('SEARCH props sample:', JSON.stringify((searchData.props||[])[0]).slice(0,400));
 
-    const beds=subject?.bedrooms||null;
-    const bathsRaw=subject?.bathrooms||null;
-    const sqft=subject?.livingArea||null;
+    // Find the best matching property from extended search by street number
+    const streetNum=(addr.match(/^\d+/)||[])[0]||'';
+    const props=searchData.props||[];
+    const subject=props.find(p=>{
+      const sa=(p.address||'').toLowerCase();
+      return streetNum&&sa.includes(streetNum.toLowerCase());
+    })||props[0]||null;
+
+    console.log('MATCHED SUBJECT:', JSON.stringify(subject));
+
+    const beds=subject?.bedrooms||subject?.beds||null;
+    const bathsRaw=subject?.bathrooms||subject?.baths||null;
+    const sqft=subject?.livingArea||subject?.area||null;
     const yearBuilt=subject?.yearBuilt||null;
     const lastSoldPrice=subject?.price||subject?.lastSoldPrice||null;
     const lastSoldDate=subject?.dateSold||subject?.lastSoldDate||null;
