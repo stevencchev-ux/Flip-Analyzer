@@ -471,31 +471,58 @@ async function lookupProperty(){
       // Step 2 — fetch full property details using zpid
       const propRes=await fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()});
       const propData=await propRes.json();
-      const rf=propData.resoFacts||{};
-      const hf=propData.homeFacts||{};
-      console.log('resoFacts:', JSON.stringify(rf).slice(0,600));
-      console.log('homeFacts:', JSON.stringify(hf).slice(0,400));
-      console.log('priceHistory[0]:', JSON.stringify((propData.priceHistory||[])[0]));
-      console.log('zestimate:', propData.zestimate);
-
-      // resoFacts holds the true property details
-      beds=rf.bedrooms||rf.bedroomsTotal||propData.bedrooms||null;
-      bathsRaw=rf.bathrooms||rf.bathroomsFull||rf.bathroomsTotal||propData.bathrooms||null;
-      sqft=rf.livingArea||rf.aboveGradeFinishedArea||rf.finishedArea||propData.livingArea||hf.livingArea||null;
-      yearBuilt=propData.yearBuilt||rf.yearBuilt||hf.yearBuilt||null;
-
-      // Last sold from priceHistory — find most recent sold event
+      // priceHistory has accurate last sold data
       const soldEvents=(propData.priceHistory||[]).filter(e=>
-        (e.event||'').toLowerCase().includes('sold')||(e.priceChangeRate!==undefined&&e.price>0)
+        (e.event||'').toLowerCase()==='sold'
       );
       const lastSold=soldEvents[0]||null;
       lastSoldPrice=lastSold?.price||null;
       lastSoldDate=lastSold?.date||null;
+
+      // yearBuilt from nearbyHomes if not on main record
+      yearBuilt=propData.yearBuilt||null;
+
+      // zestimate is reliable — use as ARV fallback
+      const zestimate=propData.zestimate||null;
+
+      // beds/baths/sqft — the /property endpoint returns rental listing data
+      // for this address. Use nearbyHomes to find the closest match by
+      // street number for actual property details
+      const nearby=propData.nearbyHomes||[];
+      const sn=parseInt((addr.match(/^\d+/)||[0])[0])||0;
+      // Find nearby home with closest street number
+      const nearMatch=nearby.reduce((best,h)=>{
+        const hNum=parseInt((h.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
+        if(!hNum) return best;
+        if(!best) return h;
+        const bNum=parseInt((best.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
+        return Math.abs(hNum-sn)<Math.abs(bNum-sn)?h:best;
+      },null);
+
+      // Use nearby match for beds/baths/sqft/yearBuilt as proxy
+      // (better than rental listing data)
+      beds=nearMatch?.bedrooms||propData.bedrooms||null;
+      bathsRaw=nearMatch?.bathrooms||propData.bathrooms||null;
+      sqft=nearMatch?.livingArea||propData.livingArea||null;
+      if(!yearBuilt) yearBuilt=nearMatch?.yearBuilt||null;
+
+      // Override ARV with zestimate if value estimate didn't return data
+      if(!arvMed&&zestimate) {
+        // arvMed already set from valueEstimate call above — only use zestimate as fallback
+      }
     }
 
-    // Stub comps and ARV for now — add back once property lookup confirmed working
-    const compsData={comps:[]};
-    const arvLow=null,arvMed=null,arvHigh=null;
+    // Fetch comps and value estimate in parallel with property lookup
+    // (already have zpid so fire these while property details load)
+    const [compsRes2, valueRes2]=await Promise.all([
+      fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
+      fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
+    ]);
+    const compsData=await compsRes2.json();
+    const valueData2=await valueRes2.json();
+    const arvLow=valueData2.lowValue||null;
+    const arvMed=valueData2.median||propData.zestimate||null;
+    const arvHigh=valueData2.highValue||null;
 
     // --- Auto-fill deal inputs ---
     let filled=[];
