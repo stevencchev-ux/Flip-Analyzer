@@ -450,12 +450,13 @@ async function lookupProperty(){
     const extRes=await fetch(`${BASE}/propertyExtendedSearch?location=${locParam}&home_type=Houses&beds_min=1`,{headers:apiHeaders()});
     const extData=await extRes.json();
 
-    console.log('EXT KEYS:', Object.keys(extData));
-    console.log('EXT props[0]:', JSON.stringify((extData.props||[])[0]).slice(0,600));
+    // API returns array directly OR object with props key
+    const allProps=Array.isArray(extData)?extData:(extData.props||extData.results||[]);
+    console.log('EXT total props:', allProps.length);
+    console.log('EXT props[0]:', JSON.stringify(allProps[0]||{}).slice(0,600));
 
     // Match property by street number
     const streetNum=(addr.match(/^\d+/)||[])[0]||'';
-    const allProps=extData.props||[];
     const matched=allProps.find(p=>{
       const a=(p.address||p.streetAddress||'').toLowerCase();
       return streetNum&&a.startsWith(streetNum.toLowerCase());
