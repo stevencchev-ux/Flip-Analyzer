@@ -448,11 +448,49 @@ async function lookupProperty(){
     const extRes=await fetch(`${BASE}/propertyExtendedSearch?location=${encodedAddr}&home_type=Houses&beds_min=1`,{headers:apiHeaders()});
     const extData=await extRes.json();
     const allProps=Array.isArray(extData)?extData:(extData.props||[]);
-    const streetNum=(addr.match(/^\d+/)||[])[0]||'';
-    const matched=allProps.find(p=>(p.address||'').toLowerCase().includes(streetNum.toLowerCase()))||allProps[0]||null;
+    // Match by street number — case insensitive, works with any address format
+    const streetNum=(addr.trim().match(/^\d+/)||[])[0]||'';
+    const matched=allProps.find(p=>{
+      const a=(p.address||p.streetAddress||'').toLowerCase();
+      return streetNum&&a.includes(streetNum);
+    })||allProps[0]||null;
     const zpid=matched?.zpid||null;
 
-    if(!zpid) throw new Error('Property not found');
+    // If no zpid just show comps and zestimate without property details
+    if(!zpid){
+      const [compsRes2,zestRes2]=await Promise.all([
+        fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
+        fetch(`${BASE}/zestimate?address=${encodedAddr}`,{headers:apiHeaders()})
+      ]);
+      const cd=await compsRes2.json();
+      const zd=await zestRes2.json();
+      if(zd.value){document.getElementById('arv').value=Math.round(zd.value);markFilled('arv');}
+      document.getElementById('save-address').value=addr;
+      const el=id=>document.getElementById(id);
+      el('profile-address-title').textContent=addr;
+      el('pp-bedbath').textContent='N/A';el('pp-sqft').textContent='N/A';
+      el('pp-year').textContent='N/A';el('pp-lastsold').textContent='N/A';
+      el('pp-lastdate').textContent='';
+      el('pp-arv-low').textContent=zd.value?('$'+Math.round(zd.value*0.95).toLocaleString()):'—';
+      el('pp-arv-med').textContent=zd.value?('$'+Math.round(zd.value).toLocaleString()):'—';
+      el('pp-arv-high').textContent=zd.value?('$'+Math.round(zd.value*1.05).toLocaleString()):'—';
+      const fc=n=>n?('$'+Math.round(n).toLocaleString()):'N/A';
+      const fn=n=>n?Math.round(n).toLocaleString():'N/A';
+      const comps=(cd.comps||[]).slice(0,5);
+      el('pp-comps').innerHTML=comps.length?comps.map((c,i)=>{
+        const st=(c.homeStatus||'').toLowerCase().replace(/_/g,' ');
+        const isSold=st.includes('sold');
+        const sl=st?st.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
+        const sa=(c.address?.streetAddress||'N/A')+(c.address?.city?', '+c.address.city:'');
+        const sf=c.livingArea?fn(c.livingArea)+' sf':'';
+        return `<div class="comp-row"><span class="comp-num">${i+1}</span><span class="comp-badge ${isSold?'cb-sold':'cb-other'}">${sl}</span><span class="comp-left"><span class="comp-price">${fc(c.price)}</span><span class="comp-addr">${sa}</span></span><span class="comp-details">${c.bedrooms||'?'}/${c.bathrooms||'?'}${sf?' · '+sf:''}</span></div>`;
+      }).join(''):'<div style="font-size:13px;color:var(--hint);padding:8px 0">No comps returned.</div>';
+      el('profile-card').style.display='block';
+      status.textContent='ARV auto-filled — property details not found, enter manually.';
+      status.className='lookup-status status-ok';
+      btn.textContent='Look up';btn.disabled=false;
+      return;
+    }
 
     // Step 2 — fire property details, comps, zestimate in parallel
     const [propRes, compsRes, zestRes]=await Promise.all([
