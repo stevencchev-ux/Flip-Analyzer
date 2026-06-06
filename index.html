@@ -30,10 +30,12 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
   header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; }
   header h1 { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
   .log-toggle-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 6px 12px; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
   .log-toggle-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
+
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem; }
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
@@ -42,15 +44,19 @@
   .field label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
   .field input, .field select { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; width: 100%; outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none; }
   .field input:focus, .field select:focus { border-color: var(--accent-dim); }
+
   .toggle-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
   .toggle-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 12px; }
   .toggle-item:last-child { border-bottom: none; }
   .toggle-item span { font-size: 13px; color: var(--text); }
   .toggle-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+
   .run-btn { width: 100%; padding: 14px; background: var(--accent); color: #080c14; border: none; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; margin-bottom: 2rem; transition: background 0.15s, transform 0.1s; }
   .run-btn:hover { background: var(--accent-bright); }
   .run-btn:active { transform: scale(0.99); }
+
   #results { display: none; }
+
   .grade-strip { display: flex; align-items: center; gap: 1.5rem; padding: 1.25rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
   .grade-badge { font-family: var(--font-mono); font-size: 28px; font-weight: 500; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 6px; flex-shrink: 0; }
   .grade-A { background: var(--grade-a-bg); color: var(--grade-a); border: 1px solid var(--grade-a); }
@@ -64,11 +70,13 @@
   .flag-warn { background: #2a1a0a; color: var(--warn); border-color: var(--warn); }
   .flag-bad { background: #2a0a0a; color: var(--danger); border-color: var(--danger); }
   .flag-good { background: #0a1a2a; color: var(--accent); border-color: var(--accent); }
+
   .glance-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1rem; }
   .glance-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-align: center; }
   .glance-card .gl { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); margin-bottom: 6px; }
   .glance-card .gv { font-family: var(--font-mono); font-size: 20px; font-weight: 500; color: var(--text); }
   .glance-card .gs { font-size: 11px; color: var(--hint); margin-top: 3px; }
+
   .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
   .summary-col { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; }
   .summary-col-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hint); margin-bottom: 1rem; }
@@ -86,16 +94,20 @@
   .profit-pos { color: var(--accent) !important; }
   .profit-neg { color: var(--danger) !important; }
   hr.sd { border: none; border-top: 1px solid var(--border); margin: 6px 0; }
+
   .labor-note { background: var(--surface2); border: 1px solid var(--border2); border-left: 3px solid var(--accent-dim); border-radius: 4px; padding: 10px 14px; font-size: 12px; color: var(--muted); margin-bottom: 1.5rem; font-family: var(--font-mono); line-height: 1.7; }
   .labor-note strong { color: var(--accent); font-weight: 500; }
 
-  /* Save bar */
-  .save-bar { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
-  .save-bar input { flex: 1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.15s; }
-  .save-bar input:focus { border-color: var(--accent-dim); }
-  .save-bar input::placeholder { color: var(--hint); }
-  .save-btn { background: var(--surface2); border: 1px solid var(--accent-dim); border-radius: 4px; color: var(--accent); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
-  .save-btn:hover { background: var(--accent-dim); color: #fff; }
+  /* Save + Share bar */
+  .action-bar { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+  .action-bar input { flex: 1; min-width: 180px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.15s; }
+  .action-bar input:focus { border-color: var(--accent-dim); }
+  .action-bar input::placeholder { color: var(--hint); }
+  .action-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .action-btn.primary { border-color: var(--accent-dim); color: var(--accent); }
+  .action-btn.primary:hover { background: var(--accent-dim); color: #fff; }
+  .action-btn.share { border-color: var(--border2); color: var(--muted); }
+  .action-btn.share:hover { border-color: var(--accent-dim); color: var(--accent); }
 
   /* Deal log panel */
   #log-panel { display: none; border-top: 1px solid var(--border); background: var(--surface); }
@@ -103,8 +115,6 @@
   .log-inner { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem; }
   .log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
   .log-header-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); }
-  .log-clear-btn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--danger); background: none; border: 1px solid var(--danger); border-radius: 3px; padding: 4px 10px; cursor: pointer; opacity: 0.7; transition: opacity 0.15s; }
-  .log-clear-btn:hover { opacity: 1; }
   #log-empty { font-size: 13px; color: var(--hint); font-family: var(--font-mono); padding: 1rem 0; }
   .log-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .log-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
@@ -112,24 +122,26 @@
   .log-table tr:last-child td { border-bottom: none; }
   .log-table tr:hover td { background: var(--surface2); }
   .log-address { font-weight: 500; color: var(--text); }
-  .log-date { font-family: var(--font-mono); font-size: 11px; color: var(--hint); }
+  .log-meta { font-family: var(--font-mono); font-size: 11px; color: var(--hint); margin-top: 2px; }
   .log-val { font-family: var(--font-mono); font-size: 12px; color: var(--text); }
   .log-pos { color: var(--accent); }
   .log-neg { color: var(--danger); }
-  .log-del { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 3px; transition: color 0.15s; }
-  .log-del:hover { color: var(--danger); }
   .log-grade { font-family: var(--font-mono); font-size: 12px; font-weight: 500; display: inline-block; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
   .lg-A { background: var(--grade-a-bg); color: var(--grade-a); border-color: var(--grade-a); }
   .lg-B { background: var(--grade-b-bg); color: var(--grade-b); border-color: var(--grade-b); }
   .lg-C { background: var(--grade-c-bg); color: var(--grade-c); border-color: var(--grade-c); }
   .lg-D { background: var(--grade-d-bg); color: var(--grade-d); border-color: var(--grade-d); }
+  .log-actions { display: flex; gap: 6px; align-items: center; }
+  .log-icon-btn { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 3px; transition: color 0.15s; line-height: 1; }
+  .log-icon-btn:hover { color: var(--accent); }
+  .log-icon-btn.del:hover { color: var(--danger); }
 
   @media (max-width: 680px) {
     .container, .log-inner { padding: 1rem; }
     header { padding: 1rem; }
     .grid3, .summary-grid, .glance-grid { grid-template-columns: 1fr; }
     .toggle-list { grid-template-columns: 1fr; }
-    .save-bar { flex-direction: column; align-items: stretch; }
+    .action-bar { flex-direction: column; align-items: stretch; }
     .log-table th:nth-child(4), .log-table td:nth-child(4),
     .log-table th:nth-child(5), .log-table td:nth-child(5) { display: none; }
   }
@@ -146,7 +158,6 @@
   <div class="log-inner">
     <div class="log-header">
       <div class="log-header-title">Saved deals</div>
-      <button class="log-clear-btn" onclick="clearLog()">Clear all</button>
     </div>
     <div id="log-empty">No deals saved yet.</div>
     <table class="log-table" id="log-table" style="display:none">
@@ -221,6 +232,7 @@
   <button class="run-btn" onclick="analyze()">Run Deal Analysis</button>
 
   <div id="results">
+
     <div class="grade-strip">
       <div id="grade_badge" class="grade-badge grade-A">A</div>
       <div class="grade-basis">
@@ -283,9 +295,10 @@
       <strong>How labor is calculated —</strong> each task is priced by time × crew day rate with a 10% time contingency applied per task. The <strong>crew buffer</strong> ($3,600) covers overlap days, prep days, and off days. The <strong>contingency</strong> (12% base / 15% full scope) covers material overruns and scope surprises. Exterior paint is a separate sub at $660/day.
     </div>
 
-    <div class="save-bar">
-      <input type="text" id="save-address" placeholder="Enter property address to save this deal…">
-      <button class="save-btn" onclick="saveDeal()">Save to log</button>
+    <div class="action-bar">
+      <input type="text" id="save-address" placeholder="Enter property address…">
+      <button class="action-btn primary" onclick="saveDeal()">Save to log</button>
+      <button class="action-btn share" onclick="shareDeal()">Share via SMS</button>
     </div>
 
   </div>
@@ -336,8 +349,7 @@ function calcLabor(sqft,beds,baths,cab_qty,win_qty,light_qty){
   const fullBaths=Math.floor(baths), cb=Math.ceil(baths), doors=beds+cb+1, rr=Math.ceil(light_qty/8);
   let l=0;
   l+=rB+rC+rD+rE;
-  l+=(rB+rC)*(3*C);
-  l+=250;
+  l+=(rB+rC)*(3*C); l+=250;
   l+=(rB+rC)*1;
   l+=hrs(doors*(20/60),rB);
   l+=(rB+rC)*(1.5*C);
@@ -350,8 +362,7 @@ function calcLabor(sqft,beds,baths,cab_qty,win_qty,light_qty){
   l+=fullBaths*300;
   l+=hrs(cb*3.5,rB);
   l+=hrs(cb*(45/60),rB);
-  l+=hrs(rr*2,rB);
-  l+=hrs(rr*1,rB);
+  l+=hrs(rr*2,rB); l+=hrs(rr*1,rB);
   l+=hrs(light_qty*(2.5/60),rB);
   l+=hrs(2.5,rB);
   l+=(rB+rC)*hrs(doors*1.25,1);
@@ -423,7 +434,10 @@ function analyze(){
   if(roi>20)flags.push({t:'Strong ROI',cls:'flag-good'});
   if(holdWeeks<=6)flags.push({t:'Fast-flip profile',cls:'flag-good'});
 
-  lastResult={purchase,arv,sqft,beds,baths,grade,bp,fp,inv,roi,market:document.getElementById('market').value,holdWeeks};
+  lastResult={purchase,arv,sqft,beds,baths,grade,bp,fp,inv,roi,
+    market:document.getElementById('market').value,holdWeeks,
+    mb,lb,base_reno,full_reno,carry,closingBuy,closingSell,bc,fc,
+    opt_mat:mb+opt.mat, opt_lab:lb+opt.lab, opt_sub:opt.sub};
 
   const el=id=>document.getElementById(id);
   el('results').style.display='block';
@@ -454,13 +468,39 @@ function analyze(){
   el('results').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+// --- SHARE VIA SMS ---
+function shareDeal(){
+  if(!lastResult){alert('Run an analysis first.');return;}
+  const addr=document.getElementById('save-address').value.trim();
+  const r=lastResult;
+  const addrLine=addr?addr:'(address not entered)';
+  const msg=
+`DEAL SUMMARY — ${addrLine}
+Grade: ${r.grade}
+Market: ${r.market} · ${r.sqft.toLocaleString()} sqft · ${r.beds}bd/${r.baths}ba
+Purchase: ${fmt(r.purchase)} · ARV: ${fmt(r.arv)}
+
+BASE SCOPE
+  Renovation: ${fmt(r.base_reno)}
+  Best profit: ${fmt(r.bp)}
+
+FULL SCOPE (worst case)
+  Renovation: ${fmt(r.full_reno)}
+  Worst profit: ${fmt(r.fp)}
+
+All-in invested: ${fmt(r.inv)}
+ROI: ${pct(r.roi)} · Hold: ${r.holdWeeks} weeks
+
+Analyzed via Fix & Flip Engine`;
+
+  const encoded=encodeURIComponent(msg);
+  // sms: URI opens native messages app on iOS and Android
+  window.location.href=`sms:?body=${encoded}`;
+}
+
 // --- DEAL LOG ---
-function getLog(){
-  try{return JSON.parse(localStorage.getItem(LOG_KEY))||[];}catch(e){return[];}
-}
-function saveLog(log){
-  try{localStorage.setItem(LOG_KEY,JSON.stringify(log));}catch(e){}
-}
+function getLog(){try{return JSON.parse(localStorage.getItem(LOG_KEY))||[];}catch(e){return[];}}
+function saveLog(log){try{localStorage.setItem(LOG_KEY,JSON.stringify(log));}catch(e){}}
 
 function saveDeal(){
   if(!lastResult){alert('Run an analysis first.');return;}
@@ -468,36 +508,43 @@ function saveDeal(){
   if(!addr){alert('Please enter a property address.');return;}
   const log=getLog();
   log.unshift({
-    id: Date.now(),
-    address: addr,
-    grade: lastResult.grade,
-    bp: lastResult.bp,
-    fp: lastResult.fp,
-    purchase: lastResult.purchase,
-    arv: lastResult.arv,
-    sqft: lastResult.sqft,
-    market: lastResult.market,
-    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+    id:Date.now(),
+    address:addr,
+    grade:lastResult.grade,
+    bp:lastResult.bp,
+    fp:lastResult.fp,
+    purchase:lastResult.purchase,
+    arv:lastResult.arv,
+    sqft:lastResult.sqft,
+    market:lastResult.market,
+    date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
   });
   saveLog(log);
   document.getElementById('save-address').value='';
   renderLog();
   updateLogCount();
-  // briefly open the log to confirm
   const panel=document.getElementById('log-panel');
-  if(!panel.classList.contains('open')){panel.classList.add('open');}
+  if(!panel.classList.contains('open'))panel.classList.add('open');
+}
+
+function shareLogDeal(id){
+  const deal=getLog().find(d=>d.id===id);
+  if(!deal)return;
+  const msg=
+`DEAL SUMMARY — ${deal.address}
+Grade: ${deal.grade}
+Market: ${deal.market} · ${deal.sqft.toLocaleString()} sqft
+Purchase: ${fmt(deal.purchase)} · ARV: ${fmt(deal.arv)}
+Best profit: ${fmt(deal.bp)}
+Worst profit: ${fmt(deal.fp)}
+Saved: ${deal.date}
+
+Analyzed via Fix & Flip Engine`;
+  window.location.href=`sms:?body=${encodeURIComponent(msg)}`;
 }
 
 function deleteDeal(id){
-  const log=getLog().filter(d=>d.id!==id);
-  saveLog(log);
-  renderLog();
-  updateLogCount();
-}
-
-function clearLog(){
-  if(!confirm('Clear all saved deals?'))return;
-  saveLog([]);
+  saveLog(getLog().filter(d=>d.id!==id));
   renderLog();
   updateLogCount();
 }
@@ -507,37 +554,31 @@ function renderLog(){
   const empty=document.getElementById('log-empty');
   const table=document.getElementById('log-table');
   const tbody=document.getElementById('log-tbody');
-  if(!log.length){
-    empty.style.display='block';
-    table.style.display='none';
-    return;
-  }
+  if(!log.length){empty.style.display='block';table.style.display='none';return;}
   empty.style.display='none';
   table.style.display='table';
   tbody.innerHTML=log.map(d=>`
     <tr>
-      <td><div class="log-address">${d.address}</div><div class="log-date">${d.market} · ${d.sqft.toLocaleString()} sqft</div></td>
+      <td><div class="log-address">${d.address}</div><div class="log-meta">${d.market} · ${d.sqft.toLocaleString()} sqft</div></td>
       <td><span class="log-grade lg-${d.grade}">${d.grade}</span></td>
       <td class="log-val ${d.bp>=0?'log-pos':'log-neg'}">${fmt(d.bp)}</td>
       <td class="log-val ${d.fp>=0?'log-pos':'log-neg'}">${fmt(d.fp)}</td>
       <td class="log-val">${fmt(d.purchase)}</td>
       <td class="log-val">${fmt(d.arv)}</td>
-      <td class="log-date">${d.date}</td>
-      <td><button class="log-del" onclick="deleteDeal(${d.id})" title="Remove">×</button></td>
+      <td class="log-meta">${d.date}</td>
+      <td>
+        <div class="log-actions">
+          <button class="log-icon-btn" onclick="shareLogDeal(${d.id})" title="Share via SMS">&#8599;</button>
+          <button class="log-icon-btn del" onclick="deleteDeal(${d.id})" title="Remove">&#215;</button>
+        </div>
+      </td>
     </tr>
   `).join('');
 }
 
-function toggleLog(){
-  document.getElementById('log-panel').classList.toggle('open');
-}
+function toggleLog(){document.getElementById('log-panel').classList.toggle('open');}
+function updateLogCount(){const n=getLog().length;document.getElementById('log-count').textContent=n?`(${n})`:''; }
 
-function updateLogCount(){
-  const n=getLog().length;
-  document.getElementById('log-count').textContent=n?`(${n})`:'';
-}
-
-// init
 renderLog();
 updateLogCount();
 </script>
