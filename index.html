@@ -444,8 +444,8 @@ async function lookupProperty(){
   try{
     const encodedAddr=encodeURIComponent(addr);
 
-    // Fire all three in parallel:
-    // 1) propertyExtendedSearch — address search returns subject property details
+    // Three calls in parallel — Pro plan supports 2 req/sec
+    // 1) propertyExtendedSearch — subject property details by address
     // 2) propertyComps — nearby sold comps
     // 3) valueEstimate — ARV range
     const searchParams=new URLSearchParams({location:addr,home_type:'Houses'});
@@ -459,17 +459,15 @@ async function lookupProperty(){
     const compsData=await compsRes.json();
     const valueData=await valueRes.json();
 
-    console.log('SEARCH props sample:', JSON.stringify((searchData.props||[])[0]).slice(0,400));
-
-    // Find the best matching property from extended search by street number
+    // Find subject property — match by street number from address
     const streetNum=(addr.match(/^\d+/)||[])[0]||'';
     const props=searchData.props||[];
     const subject=props.find(p=>{
-      const sa=(p.address||'').toLowerCase();
-      return streetNum&&sa.includes(streetNum.toLowerCase());
+      const sa=(p.address||p.streetAddress||'').toLowerCase();
+      return streetNum&&sa.includes(streetNum);
     })||props[0]||null;
 
-    console.log('MATCHED SUBJECT:', JSON.stringify(subject));
+    console.log('SUBJECT:', JSON.stringify(subject));
 
     const beds=subject?.bedrooms||subject?.beds||null;
     const bathsRaw=subject?.bathrooms||subject?.baths||null;
