@@ -444,50 +444,38 @@ async function lookupProperty(){
   try{
     const encodedAddr=encodeURIComponent(addr);
 
-    // Step 1 — extended search to find zpid
+    // Step 1 — get zpid via extended search
     const extRes=await fetch(`${BASE}/propertyExtendedSearch?location=${encodedAddr}&home_type=Houses&beds_min=1`,{headers:apiHeaders()});
     const extData=await extRes.json();
     const allProps=Array.isArray(extData)?extData:(extData.props||[]);
     const streetNum=(addr.match(/^\d+/)||[])[0]||'';
-    const matched=allProps.find(p=>(p.address||'').toLowerCase().startsWith(streetNum.toLowerCase()))||allProps[0]||null;
+    const matched=allProps.find(p=>(p.address||'').toLowerCase().includes(streetNum.toLowerCase()))||allProps[0]||null;
     const zpid=matched?.zpid||null;
 
-    // Step 2 — fetch property details + comps + value estimate in parallel
-    const calls=[
+    if(!zpid) throw new Error('Property not found');
+
+    // Step 2 — fire property details, comps, zestimate in parallel
+    const [propRes, compsRes, zestRes]=await Promise.all([
+      fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()}),
       fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
-      fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
-    ];
-    if(zpid) calls.push(fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()}));
+      fetch(`${BASE}/zestimate?address=${encodedAddr}`,{headers:apiHeaders()})
+    ]);
+    const prop=await propRes.json();
+    const compsData=await compsRes.json();
+    const zestData=await zestRes.json();
 
-    const results=await Promise.all(calls);
-    const compsData=await results[0].json();
-    const valueData=await results[1].json();
-    const propData=zpid?(await results[2].json()):null;
-
-    // Value estimate
-    const arvLow=valueData.lowValue||null;
-    const arvMed=valueData.median||propData?.zestimate||null;
-    const arvHigh=valueData.highValue||null;
+    // Extract property details — direct fields work for normal properties
+    const beds=prop.bedrooms||null;
+    const bathsRaw=prop.bathrooms||null;
+    const sqft=prop.livingArea||null;
+    const yearBuilt=prop.yearBuilt||null;
+    const arvVal=zestData.value||prop.zestimate||null;
 
     // Last sold from priceHistory
-    const soldEvents=(propData?.priceHistory||[]).filter(e=>(e.event||'').toLowerCase()==='sold');
+    const soldEvents=(prop.priceHistory||[]).filter(e=>(e.event||'').toLowerCase()==='sold');
     const lastSold=soldEvents[0]||null;
     const lastSoldPrice=lastSold?.price||null;
     const lastSoldDate=lastSold?.date||null;
-    const yearBuilt=propData?.yearBuilt||null;
-
-    // beds/baths/sqft — use nearbyHomes closest match since property may be a rental listing
-    const nearby=propData?.nearbyHomes||[];
-    const sn=parseInt(streetNum)||0;
-    const nearMatch=nearby.reduce((best,h)=>{
-      if(!best) return h;
-      const hN=parseInt((h.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
-      const bN=parseInt((best.address?.streetAddress||'').match(/^\d+/)?.[0])||0;
-      return Math.abs(hN-sn)<Math.abs(bN-sn)?h:best;
-    },null);
-    const beds=nearMatch?.bedrooms||propData?.bedrooms||null;
-    const bathsRaw=nearMatch?.bathrooms||propData?.bathrooms||null;
-    const sqft=nearMatch?.livingArea||propData?.livingArea||null;
 
     // --- Auto-fill deal inputs ---
     let filled=[];
@@ -507,7 +495,7 @@ async function lookupProperty(){
       filled.push('baths');
     }
     if(sqft){document.getElementById('sqft').value=Math.round(sqft);markFilled('sqft');filled.push('sqft');}
-    if(arvMed){document.getElementById('arv').value=Math.round(arvMed);markFilled('arv');filled.push('ARV');}
+    if(arvVal){document.getElementById('arv').value=Math.round(arvVal);markFilled('arv');filled.push('ARV');}
     document.getElementById('save-address').value=addr;
 
     // --- Populate profile card ---
@@ -516,25 +504,25 @@ async function lookupProperty(){
     const el=id=>document.getElementById(id);
 
     el('profile-address-title').textContent=addr;
-    el('pp-bedbath').textContent=(beds&&bathsRaw)?(Math.round(beds)+'bd / '+bathsRaw+'ba'):(beds?Math.round(beds)+'bd':'N/A');
+    el('pp-bedbath').textContent=(beds&&bathsRaw)?(Math.round(beds)+'bd / '+bathsRaw+'ba'):'N/A';
     el('pp-sqft').textContent=sqft?fn(sqft)+' sqft':'N/A';
     el('pp-year').textContent=yearBuilt||'N/A';
     el('pp-lastsold').textContent=lastSoldPrice?fc(lastSoldPrice):'N/A';
     el('pp-lastdate').textContent=lastSoldDate||'';
-    el('pp-arv-low').textContent=arvLow?fc(arvLow):'—';
-    el('pp-arv-med').textContent=arvMed?fc(arvMed):'—';
-    el('pp-arv-high').textContent=arvHigh?fc(arvHigh):'—';
+    el('pp-arv-low').textContent=arvVal?fc(Math.round(arvVal*0.95)):'—';
+    el('pp-arv-med').textContent=arvVal?fc(arvVal):'—';
+    el('pp-arv-high').textContent=arvVal?fc(Math.round(arvVal*1.05)):'—';
 
     const comps=(compsData.comps||[]).slice(0,5);
     const compsHtml=comps.length?comps.map((c,i)=>{
       const price=fc(c.price||c.lastSoldPrice);
-      const status2=(c.homeStatus||c.status||'').toLowerCase().replace(/_/g,' ');
-      const isSold=status2.includes('sold');
-      const statusLabel=status2?status2.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
+      const st=(c.homeStatus||'').toLowerCase().replace(/_/g,' ');
+      const isSold=st.includes('sold');
+      const statusLabel=st?st.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
       const street=c.address?.streetAddress||'N/A';
       const city=c.address?.city||'';
       const shortAddr=street+(city?', '+city:'');
-      const bd=c.bedrooms||'?'; const ba=c.bathrooms||'?';
+      const bd=c.bedrooms||'?';const ba=c.bathrooms||'?';
       const sf=c.livingArea?fn(c.livingArea)+' sf':'';
       return `<div class="comp-row">
         <span class="comp-num">${i+1}</span>
@@ -546,13 +534,10 @@ async function lookupProperty(){
     el('pp-comps').innerHTML=compsHtml;
     el('profile-card').style.display='block';
 
-    if(filled.length){
-      status.textContent=`Auto-filled: ${filled.join(', ')} — review and adjust before running analysis.`;
-      status.className='lookup-status status-ok';
-    } else {
-      status.textContent='Property found — fill in details manually.';
-      status.className='lookup-status status-err';
-    }
+    status.textContent=filled.length
+      ?`Auto-filled: ${filled.join(', ')} — review and adjust before running analysis.`
+      :'Property loaded — fill in details manually.';
+    status.className='lookup-status status-ok';
 
   }catch(e){
     console.error('Lookup error:',e);
