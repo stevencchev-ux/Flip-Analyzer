@@ -30,11 +30,12 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
-  header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; }
   header h1 { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+  .log-toggle-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 6px 12px; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+  .log-toggle-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
   .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem; }
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
-  .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
   .card-title { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); margin-bottom: 1.25rem; }
   .field { display: flex; flex-direction: column; gap: 5px; }
@@ -85,14 +86,52 @@
   .profit-pos { color: var(--accent) !important; }
   .profit-neg { color: var(--danger) !important; }
   hr.sd { border: none; border-top: 1px solid var(--border); margin: 6px 0; }
-  .labor-note { background: var(--surface2); border: 1px solid var(--border2); border-left: 3px solid var(--accent-dim); border-radius: 4px; padding: 10px 14px; font-size: 12px; color: var(--muted); margin-top: 8px; font-family: var(--font-mono); line-height: 1.7; }
+  .labor-note { background: var(--surface2); border: 1px solid var(--border2); border-left: 3px solid var(--accent-dim); border-radius: 4px; padding: 10px 14px; font-size: 12px; color: var(--muted); margin-bottom: 1.5rem; font-family: var(--font-mono); line-height: 1.7; }
   .labor-note strong { color: var(--accent); font-weight: 500; }
+
+  /* Save bar */
+  .save-bar { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+  .save-bar input { flex: 1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.15s; }
+  .save-bar input:focus { border-color: var(--accent-dim); }
+  .save-bar input::placeholder { color: var(--hint); }
+  .save-btn { background: var(--surface2); border: 1px solid var(--accent-dim); border-radius: 4px; color: var(--accent); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+  .save-btn:hover { background: var(--accent-dim); color: #fff; }
+
+  /* Deal log panel */
+  #log-panel { display: none; border-top: 1px solid var(--border); background: var(--surface); }
+  #log-panel.open { display: block; }
+  .log-inner { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem; }
+  .log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .log-header-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); }
+  .log-clear-btn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--danger); background: none; border: 1px solid var(--danger); border-radius: 3px; padding: 4px 10px; cursor: pointer; opacity: 0.7; transition: opacity 0.15s; }
+  .log-clear-btn:hover { opacity: 1; }
+  #log-empty { font-size: 13px; color: var(--hint); font-family: var(--font-mono); padding: 1rem 0; }
+  .log-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .log-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .log-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-table tr:hover td { background: var(--surface2); }
+  .log-address { font-weight: 500; color: var(--text); }
+  .log-date { font-family: var(--font-mono); font-size: 11px; color: var(--hint); }
+  .log-val { font-family: var(--font-mono); font-size: 12px; color: var(--text); }
+  .log-pos { color: var(--accent); }
+  .log-neg { color: var(--danger); }
+  .log-del { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 3px; transition: color 0.15s; }
+  .log-del:hover { color: var(--danger); }
+  .log-grade { font-family: var(--font-mono); font-size: 12px; font-weight: 500; display: inline-block; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
+  .lg-A { background: var(--grade-a-bg); color: var(--grade-a); border-color: var(--grade-a); }
+  .lg-B { background: var(--grade-b-bg); color: var(--grade-b); border-color: var(--grade-b); }
+  .lg-C { background: var(--grade-c-bg); color: var(--grade-c); border-color: var(--grade-c); }
+  .lg-D { background: var(--grade-d-bg); color: var(--grade-d); border-color: var(--grade-d); }
+
   @media (max-width: 680px) {
-    .container { padding: 1rem; }
+    .container, .log-inner { padding: 1rem; }
     header { padding: 1rem; }
-    .grid3, .grid4, .summary-grid, .glance-grid { grid-template-columns: 1fr; }
+    .grid3, .summary-grid, .glance-grid { grid-template-columns: 1fr; }
     .toggle-list { grid-template-columns: 1fr; }
-    .toggle-item:last-child { border-bottom: none; }
+    .save-bar { flex-direction: column; align-items: stretch; }
+    .log-table th:nth-child(4), .log-table td:nth-child(4),
+    .log-table th:nth-child(5), .log-table td:nth-child(5) { display: none; }
   }
 </style>
 </head>
@@ -100,7 +139,33 @@
 
 <header>
   <h1>Fix &amp; Flip Engine</h1>
+  <button class="log-toggle-btn" onclick="toggleLog()">Deal Log <span id="log-count"></span></button>
 </header>
+
+<div id="log-panel">
+  <div class="log-inner">
+    <div class="log-header">
+      <div class="log-header-title">Saved deals</div>
+      <button class="log-clear-btn" onclick="clearLog()">Clear all</button>
+    </div>
+    <div id="log-empty">No deals saved yet.</div>
+    <table class="log-table" id="log-table" style="display:none">
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th>Grade</th>
+          <th>Best profit</th>
+          <th>Worst profit</th>
+          <th>Purchase</th>
+          <th>ARV</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="log-tbody"></tbody>
+    </table>
+  </div>
+</div>
 
 <div class="container">
 
@@ -217,6 +282,12 @@
     <div class="labor-note">
       <strong>How labor is calculated —</strong> each task is priced by time × crew day rate with a 10% time contingency applied per task. The <strong>crew buffer</strong> ($3,600) covers overlap days, prep days, and off days. The <strong>contingency</strong> (12% base / 15% full scope) covers material overruns and scope surprises. Exterior paint is a separate sub at $660/day.
     </div>
+
+    <div class="save-bar">
+      <input type="text" id="save-address" placeholder="Enter property address to save this deal…">
+      <button class="save-btn" onclick="saveDeal()">Save to log</button>
+    </div>
+
   </div>
 </div>
 
@@ -224,27 +295,24 @@
 const TAX=1.105, DISPOSAL=1500, SELL_PCT=0.025;
 const rA=400, rB=300, rC=300, rD=260, rE=160;
 const CREW_BUFFER=3*300*4;
-const C=1.10; // 10% time contingency multiplier
+const C=1.10;
+const LOG_KEY='flip_analyzer_log';
+let lastResult=null;
+
 function fmt(n){return'$'+Math.round(n).toLocaleString()}
 function pct(n){return(Math.round(n*10)/10)+'%'}
 function hrs(h,rate){return(h*C/8)*rate}
 
 function calcMaterials(sqft,beds,baths,cab_qty,win_qty,light_qty){
-  const fullBaths=Math.floor(baths);
-  const doors=beds+Math.ceil(baths)+1;
-  const m={};
+  const fullBaths=Math.floor(baths), doors=beds+Math.ceil(baths)+1, m={};
   m.lvp=sqft*1.79;
   m.baseboards=Math.ceil((sqft*0.5)/16)*8.25;
   m.casings=doors*2*7.90;
   m.cabinets=cab_qty*425;
-  m.countertop=2000;
-  m.sink=350; m.sink_faucet=150;
-  m.disposal_mat=175+35; m.range=900; m.range_hood=250; m.fridge=1200;
-  m.vanities=Math.ceil(baths)*425;
-  m.toilets=Math.ceil(baths)*165;
-  m.tubs=fullBaths*550;
-  m.shower_tile_wall=fullBaths*90*3.75;
-  m.bath_floor_tile=fullBaths*45*3.75;
+  m.countertop=2000; m.sink=350; m.sink_faucet=150;
+  m.disposal_mat=210; m.range=900; m.range_hood=250; m.fridge=1200;
+  m.vanities=Math.ceil(baths)*425; m.toilets=Math.ceil(baths)*165; m.tubs=fullBaths*550;
+  m.shower_tile_wall=fullBaths*90*3.75; m.bath_floor_tile=fullBaths*45*3.75;
   m.schluter=fullBaths*25; m.thinset=fullBaths*4*15; m.grout=fullBaths*25;
   m.spacers=fullBaths*50; m.waterproofing=fullBaths*80;
   m.backer_board=fullBaths*Math.ceil(90/32)*17.50;
@@ -259,105 +327,53 @@ function calcMaterials(sqft,beds,baths,cab_qty,win_qty,light_qty){
   m.faceplates=Math.ceil((Math.ceil(baths)*2+doors)*1.5/10)*8;
   m.smoke=(beds+Math.ceil(baths)+2)*54;
   m.paint=Math.ceil(sqft/1000)*168;
-  m.doors=doors*100;
-  m.door_hw=Math.ceil(doors/30)*25;
-  m.cab_hw=Math.ceil(cab_qty*2/30)*25;
-  m.consumables=sqft*0.175;
-  m.supply=(Math.ceil(baths)+1)*25;
+  m.doors=doors*100; m.door_hw=Math.ceil(doors/30)*25; m.cab_hw=Math.ceil(cab_qty*2/30)*25;
+  m.consumables=sqft*0.175; m.supply=(Math.ceil(baths)+1)*25;
   return Object.values(m).reduce((a,b)=>a+b,0)*TAX;
 }
 
 function calcLabor(sqft,beds,baths,cab_qty,win_qty,light_qty){
-  const fullBaths=Math.floor(baths);
-  const ceilBaths=Math.ceil(baths);
-  const doors=beds+ceilBaths+1;
-  const rr=Math.ceil(light_qty/8);
+  const fullBaths=Math.floor(baths), cb=Math.ceil(baths), doors=beds+cb+1, rr=Math.ceil(light_qty/8);
   let l=0;
-
-  // Demo — flat 1 day, no contingency
-  l += rB+rC+rD+rE;
-
-  // LVP flooring — 3 days × contingency × 2 guys
-  l += (rB+rC)*(3*C);
-
-  // LVP delivery flat
-  l += 250;
-
-  // Baseboards — 1 full day, B+C
-  l += (rB+rC)*1;
-
-  // Casings — 20 min per door × contingency
-  l += hrs(doors*(20/60), rB);
-
-  // Kitchen cabinets — 1.5 days × contingency × B+C
-  l += (rB+rC)*(1.5*C);
-
-  // Windows — 2 hrs per window × contingency
-  l += hrs(win_qty*2, rB);
-
-  // Vanity — 30 min per bath × contingency
-  l += hrs(ceilBaths*(30/60), rB);
-
-  // Toilet — 35 min per bath × contingency
-  l += hrs(ceilBaths*(35/60), rB);
-
-  // Tub set — 2.5 hrs per full bath × contingency
-  l += hrs(fullBaths*2.5, rB);
-
-  // Shower wall tile — 2 days per full bath × contingency × tiler A
-  l += rA*(fullBaths*2*C);
-
-  // Bath floor tile — 0.5 days per full bath × contingency × tiler A
-  l += rA*(fullBaths*0.5*C);
-
-  // Shower door — vendor flat per full bath
-  l += fullBaths*300;
-
-  // Vanity light + fixtures — 3.5 hrs per bath × contingency
-  l += hrs(ceilBaths*3.5, rB);
-
-  // P-trap — 45 min per bath × contingency
-  l += hrs(ceilBaths*(45/60), rB);
-
-  // Romex — 2 hrs per run × contingency
-  l += hrs(rr*2, rB);
-
-  // Tie-in extra — 1 hr per run × contingency
-  l += hrs(rr*1, rB);
-
-  // Light install — 2.5 min per light × contingency
-  l += hrs(light_qty*(2.5/60), rB);
-
-  // Range hood — 2.5 hrs × contingency
-  l += hrs(2.5, rB);
-
-  // Prehung doors — 1hr 15min per door × contingency × B+C
-  l += (rB+rC)*hrs(doors*1.25, 1);
-
-  // Interior paint — 2 days × contingency × B+C
-  l += (rB+rC)*(2*C);
-
-  // Exterior paint — 3.5 days flat × $660/day painter
-  l += 3.5*660;
-
+  l+=rB+rC+rD+rE;
+  l+=(rB+rC)*(3*C);
+  l+=250;
+  l+=(rB+rC)*1;
+  l+=hrs(doors*(20/60),rB);
+  l+=(rB+rC)*(1.5*C);
+  l+=hrs(win_qty*2,rB);
+  l+=hrs(cb*(30/60),rB);
+  l+=hrs(cb*(35/60),rB);
+  l+=hrs(fullBaths*2.5,rB);
+  l+=rA*(fullBaths*2*C);
+  l+=rA*(fullBaths*0.5*C);
+  l+=fullBaths*300;
+  l+=hrs(cb*3.5,rB);
+  l+=hrs(cb*(45/60),rB);
+  l+=hrs(rr*2,rB);
+  l+=hrs(rr*1,rB);
+  l+=hrs(light_qty*(2.5/60),rB);
+  l+=hrs(2.5,rB);
+  l+=(rB+rC)*hrs(doors*1.25,1);
+  l+=(rB+rC)*(2*C);
+  l+=3.5*660;
   return l;
 }
 
 function calcOpt(beds,baths,sqft,win_qty){
-  const fullBaths=Math.floor(baths);
-  const ceilBaths=Math.ceil(baths);
-  let mt=0, lab=0, sub=0;
+  const fullBaths=Math.floor(baths), cb=Math.ceil(baths);
+  let mt=0,lab=0,sub=0;
   if(document.getElementById('opt_roof').checked) sub+=13000;
   if(document.getElementById('opt_hvac').checked) sub+=11900;
   if(document.getElementById('opt_panel').checked) sub+=7000;
   if(document.getElementById('opt_garage').checked) sub+=2500;
-  if(document.getElementById('opt_wh').checked){mt+=900; lab+=400;}
-  if(document.getElementById('opt_fdoor').checked){mt+=500; lab+=rB*1*C;}
-  if(document.getElementById('opt_fans').checked){mt+=ceilBaths*65; lab+=hrs(ceilBaths*2,rB);}
-  if(document.getElementById('opt_blinds').checked){mt+=win_qty*60; lab+=hrs(win_qty*0.5,rB);}
-  if(document.getElementById('opt_primer').checked){mt+=Math.ceil(sqft/1000)*80; lab+=(rB+rC)*1*C;}
-  if(document.getElementById('opt_dw').checked){mt+=600; lab+=hrs(4,rB);}
-  return{mat:mt*TAX, lab, sub};
+  if(document.getElementById('opt_wh').checked){mt+=900;lab+=400;}
+  if(document.getElementById('opt_fdoor').checked){mt+=500;lab+=rB*1*C;}
+  if(document.getElementById('opt_fans').checked){mt+=cb*65;lab+=hrs(cb*2,rB);}
+  if(document.getElementById('opt_blinds').checked){mt+=win_qty*60;lab+=hrs(win_qty*0.5,rB);}
+  if(document.getElementById('opt_primer').checked){mt+=Math.ceil(sqft/1000)*80;lab+=(rB+rC)*1*C;}
+  if(document.getElementById('opt_dw').checked){mt+=600;lab+=hrs(4,rB);}
+  return{mat:mt*TAX,lab,sub};
 }
 
 function analyze(){
@@ -384,14 +400,14 @@ function analyze(){
   const full_reno=full_pre+fc;
 
   const carry=(purchase*0.012/12)*holdMonths+200*holdMonths+175*holdMonths;
-  const cb=purchase*0.015;
-  const cs=arv*SELL_PCT;
+  const closingBuy=purchase*0.015;
+  const closingSell=arv*SELL_PCT;
 
-  const b_out=purchase+cb+base_reno+carry+cs;
-  const f_out=purchase+cb+full_reno+carry+cs;
+  const b_out=purchase+closingBuy+base_reno+carry+closingSell;
+  const f_out=purchase+closingBuy+full_reno+carry+closingSell;
   const bp=arv-b_out;
   const fp=arv-f_out;
-  const inv=purchase+cb+base_reno+carry;
+  const inv=purchase+closingBuy+base_reno+carry;
   const roi=(bp/inv)*100;
 
   let grade,basis;
@@ -401,11 +417,13 @@ function analyze(){
   else{grade='D';basis='Does not hit $50K under any scenario';}
 
   const flags=[];
-  if(arv/sqft>900) flags.push({t:'ARV >$900/sqft',cls:'flag-warn'});
-  if(bp-fp>60000) flags.push({t:'Wide scope spread',cls:'flag-warn'});
-  if(fp<0) flags.push({t:'Full scope underwater',cls:'flag-bad'});
-  if(roi>20) flags.push({t:'Strong ROI',cls:'flag-good'});
-  if(holdWeeks<=6) flags.push({t:'Fast-flip profile',cls:'flag-good'});
+  if(arv/sqft>900)flags.push({t:'ARV >$900/sqft',cls:'flag-warn'});
+  if(bp-fp>60000)flags.push({t:'Wide scope spread',cls:'flag-warn'});
+  if(fp<0)flags.push({t:'Full scope underwater',cls:'flag-bad'});
+  if(roi>20)flags.push({t:'Strong ROI',cls:'flag-good'});
+  if(holdWeeks<=6)flags.push({t:'Fast-flip profile',cls:'flag-good'});
+
+  lastResult={purchase,arv,sqft,beds,baths,grade,bp,fp,inv,roi,market:document.getElementById('market').value,holdWeeks};
 
   const el=id=>document.getElementById(id);
   el('results').style.display='block';
@@ -414,45 +432,114 @@ function analyze(){
   el('grade_basis').textContent=basis;
   el('hold_note').textContent=holdWeeks+'-week hold · carry '+fmt(carry);
   el('flags_container').innerHTML=flags.map(f=>`<span class="flag ${f.cls}">${f.t}</span>`).join('');
-
-  el('g_best').textContent=fmt(bp);
-  el('g_best').style.color=bp>=0?'var(--accent)':'var(--danger)';
-  el('g_worst').textContent=fmt(fp);
-  el('g_worst').style.color=fp>=0?'var(--accent)':'var(--danger)';
+  el('g_best').textContent=fmt(bp); el('g_best').style.color=bp>=0?'var(--accent)':'var(--danger)';
+  el('g_worst').textContent=fmt(fp); el('g_worst').style.color=fp>=0?'var(--accent)':'var(--danger)';
   el('g_invested').textContent=fmt(inv);
   el('g_roi').textContent=pct(roi);
-
-  el('b_purchase').textContent=fmt(purchase);
-  el('b_closing_buy').textContent=fmt(cb);
-  el('b_acq_sub').textContent=fmt(purchase+cb);
-  el('b_mat').textContent=fmt(mb);
-  el('b_lab').textContent=fmt(lb);
-  el('b_crew').textContent=fmt(CREW_BUFFER);
-  el('b_contingency').textContent=fmt(bc);
-  el('b_reno_sub').textContent=fmt(base_reno);
-  el('b_carry').textContent=fmt(carry);
-  el('b_closing_sell').textContent=fmt(cs);
+  el('b_purchase').textContent=fmt(purchase); el('b_closing_buy').textContent=fmt(closingBuy);
+  el('b_acq_sub').textContent=fmt(purchase+closingBuy); el('b_mat').textContent=fmt(mb);
+  el('b_lab').textContent=fmt(lb); el('b_crew').textContent=fmt(CREW_BUFFER);
+  el('b_contingency').textContent=fmt(bc); el('b_reno_sub').textContent=fmt(base_reno);
+  el('b_carry').textContent=fmt(carry); el('b_closing_sell').textContent=fmt(closingSell);
   el('b_total_out').textContent=fmt(b_out);
-  const bpEl=el('b_profit');
-  bpEl.textContent=fmt(bp); bpEl.className='v '+(bp>=0?'profit-pos':'profit-neg');
-
-  el('f_purchase').textContent=fmt(purchase);
-  el('f_closing_buy').textContent=fmt(cb);
-  el('f_acq_sub').textContent=fmt(purchase+cb);
-  el('f_mat').textContent=fmt(mb+opt.mat);
-  el('f_lab').textContent=fmt(lb+opt.lab);
-  el('f_crew').textContent=fmt(CREW_BUFFER);
-  el('f_subs').textContent=fmt(opt.sub);
-  el('f_contingency').textContent=fmt(fc);
-  el('f_reno_sub').textContent=fmt(full_reno);
-  el('f_carry').textContent=fmt(carry);
-  el('f_closing_sell').textContent=fmt(cs);
-  el('f_total_out').textContent=fmt(f_out);
-  const fpEl=el('f_profit');
-  fpEl.textContent=fmt(fp); fpEl.className='v '+(fp>=0?'profit-pos':'profit-neg');
-
+  const bpEl=el('b_profit'); bpEl.textContent=fmt(bp); bpEl.className='v '+(bp>=0?'profit-pos':'profit-neg');
+  el('f_purchase').textContent=fmt(purchase); el('f_closing_buy').textContent=fmt(closingBuy);
+  el('f_acq_sub').textContent=fmt(purchase+closingBuy); el('f_mat').textContent=fmt(mb+opt.mat);
+  el('f_lab').textContent=fmt(lb+opt.lab); el('f_crew').textContent=fmt(CREW_BUFFER);
+  el('f_subs').textContent=fmt(opt.sub); el('f_contingency').textContent=fmt(fc);
+  el('f_reno_sub').textContent=fmt(full_reno); el('f_carry').textContent=fmt(carry);
+  el('f_closing_sell').textContent=fmt(closingSell); el('f_total_out').textContent=fmt(f_out);
+  const fpEl=el('f_profit'); fpEl.textContent=fmt(fp); fpEl.className='v '+(fp>=0?'profit-pos':'profit-neg');
+  el('save-address').value='';
   el('results').scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+// --- DEAL LOG ---
+function getLog(){
+  try{return JSON.parse(localStorage.getItem(LOG_KEY))||[];}catch(e){return[];}
+}
+function saveLog(log){
+  try{localStorage.setItem(LOG_KEY,JSON.stringify(log));}catch(e){}
+}
+
+function saveDeal(){
+  if(!lastResult){alert('Run an analysis first.');return;}
+  const addr=document.getElementById('save-address').value.trim();
+  if(!addr){alert('Please enter a property address.');return;}
+  const log=getLog();
+  log.unshift({
+    id: Date.now(),
+    address: addr,
+    grade: lastResult.grade,
+    bp: lastResult.bp,
+    fp: lastResult.fp,
+    purchase: lastResult.purchase,
+    arv: lastResult.arv,
+    sqft: lastResult.sqft,
+    market: lastResult.market,
+    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})
+  });
+  saveLog(log);
+  document.getElementById('save-address').value='';
+  renderLog();
+  updateLogCount();
+  // briefly open the log to confirm
+  const panel=document.getElementById('log-panel');
+  if(!panel.classList.contains('open')){panel.classList.add('open');}
+}
+
+function deleteDeal(id){
+  const log=getLog().filter(d=>d.id!==id);
+  saveLog(log);
+  renderLog();
+  updateLogCount();
+}
+
+function clearLog(){
+  if(!confirm('Clear all saved deals?'))return;
+  saveLog([]);
+  renderLog();
+  updateLogCount();
+}
+
+function renderLog(){
+  const log=getLog();
+  const empty=document.getElementById('log-empty');
+  const table=document.getElementById('log-table');
+  const tbody=document.getElementById('log-tbody');
+  if(!log.length){
+    empty.style.display='block';
+    table.style.display='none';
+    return;
+  }
+  empty.style.display='none';
+  table.style.display='table';
+  tbody.innerHTML=log.map(d=>`
+    <tr>
+      <td><div class="log-address">${d.address}</div><div class="log-date">${d.market} · ${d.sqft.toLocaleString()} sqft</div></td>
+      <td><span class="log-grade lg-${d.grade}">${d.grade}</span></td>
+      <td class="log-val ${d.bp>=0?'log-pos':'log-neg'}">${fmt(d.bp)}</td>
+      <td class="log-val ${d.fp>=0?'log-pos':'log-neg'}">${fmt(d.fp)}</td>
+      <td class="log-val">${fmt(d.purchase)}</td>
+      <td class="log-val">${fmt(d.arv)}</td>
+      <td class="log-date">${d.date}</td>
+      <td><button class="log-del" onclick="deleteDeal(${d.id})" title="Remove">×</button></td>
+    </tr>
+  `).join('');
+}
+
+function toggleLog(){
+  document.getElementById('log-panel').classList.toggle('open');
+}
+
+function updateLogCount(){
+  const n=getLog().length;
+  document.getElementById('log-count').textContent=n?`(${n})`:'';
+}
+
+// init
+renderLog();
+updateLogCount();
 </script>
 </body>
 </html>
