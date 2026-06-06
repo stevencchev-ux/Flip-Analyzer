@@ -471,12 +471,18 @@ async function lookupProperty(){
       // Step 2 — fetch full property details using zpid
       const propRes=await fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()});
       const propData=await propRes.json();
+      // Log all keys and specific fields to find correct names
       console.log('PROP KEYS:', Object.keys(propData));
-      console.log('PROP DATA:', JSON.stringify(propData).slice(0,800));
-      beds=propData.bedrooms||null;
-      bathsRaw=propData.bathrooms||null;
-      sqft=propData.livingArea||null;
-      yearBuilt=propData.yearBuilt||null;
+      console.log('beds candidates:', propData.bedrooms, propData.beds, propData.bedroomCount, propData.resoFacts?.bedrooms);
+      console.log('baths candidates:', propData.bathrooms, propData.baths, propData.bathroomCount, propData.resoFacts?.bathrooms, propData.resoFacts?.bathroomsFull);
+      console.log('sqft candidates:', propData.livingArea, propData.sqft, propData.resoFacts?.livingArea, propData.resoFacts?.aboveGradeFinishedArea, propData.floorSize);
+      console.log('yearBuilt candidates:', propData.yearBuilt, propData.resoFacts?.yearBuilt);
+      console.log('lastSold candidates:', propData.lastSoldPrice, propData.price, propData.lastSoldDate, propData.dateSold);
+
+      beds=propData.bedrooms||propData.resoFacts?.bedrooms||propData.beds||null;
+      bathsRaw=propData.bathrooms||propData.resoFacts?.bathrooms||propData.resoFacts?.bathroomsFull||propData.baths||null;
+      sqft=propData.livingArea||propData.resoFacts?.livingArea||propData.resoFacts?.aboveGradeFinishedArea||propData.floorSize||null;
+      yearBuilt=propData.yearBuilt||propData.resoFacts?.yearBuilt||null;
       lastSoldPrice=propData.lastSoldPrice||propData.price||null;
       lastSoldDate=propData.lastSoldDate||propData.dateSold||null;
     }
