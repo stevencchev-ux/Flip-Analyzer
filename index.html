@@ -430,9 +430,7 @@ function hideSuggestions(){
   document.getElementById('suggestions-box').style.display='none';
 }
 
-document.addEventListener('click',e=>{
-  if(!document.getElementById('lookup-card').contains(e.target)) hideSuggestions();
-});
+
 
 async function lookupProperty(){
   const status=document.getElementById('lookup-status');
@@ -454,17 +452,23 @@ async function lookupProperty(){
     const compsData=await compsRes.json();
     const valueData=await valueRes.json();
 
-    console.log('COMPS:', JSON.stringify(compsData).slice(0,600));
-    console.log('VALUE:', JSON.stringify(valueData).slice(0,400));
+    // No subject key — comps array only. Find the comp whose address
+    // most closely matches the queried address (street number match),
+    // otherwise fall back to the first comp as the best proxy.
+    const compsArr=compsData.comps||[];
+    const addrLower=addr.toLowerCase();
+    const streetNum=(addrLower.match(/^\d+/)||[])[0]||'';
+    const subject=compsArr.find(c=>{
+      const cs=(c.address?.streetAddress||'').toLowerCase();
+      return streetNum&&cs.startsWith(streetNum);
+    })||compsArr[0]||null;
 
-    // Subject property
-    const subject=compsData.subject||compsData.property||compsData.subjectProperty||null;
-    const beds=subject?.bedrooms||compsData.bedrooms||null;
-    const bathsRaw=subject?.bathrooms||compsData.bathrooms||null;
-    const sqft=subject?.livingArea||compsData.livingArea||null;
-    const yearBuilt=subject?.yearBuilt||compsData.yearBuilt||null;
-    const lastSoldPrice=subject?.lastSoldPrice||subject?.price||compsData.lastSoldPrice||null;
-    const lastSoldDate=subject?.lastSoldDate||subject?.dateSold||compsData.lastSoldDate||null;
+    const beds=subject?.bedrooms||null;
+    const bathsRaw=subject?.bathrooms||null;
+    const sqft=subject?.livingArea||null;
+    const yearBuilt=subject?.yearBuilt||null;
+    const lastSoldPrice=subject?.price||subject?.lastSoldPrice||null;
+    const lastSoldDate=subject?.dateSold||subject?.lastSoldDate||null;
 
     // Value estimate
     const arvLow=valueData.lowValue||null;
