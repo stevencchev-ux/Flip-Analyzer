@@ -444,42 +444,27 @@ async function lookupProperty(){
   try{
     const encodedAddr=encodeURIComponent(addr);
 
-    // Step 1: propertyComps + valueEstimate in parallel
-    // Step 2: if comps returns a zpid for the subject, fetch /property for exact details
-    const [compsRes, valueRes]=await Promise.all([
-      fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
-      fetch(`${BASE}/valueEstimate?address=${encodedAddr}&d=4.0&propertyType=SingleFamily`,{headers:apiHeaders()})
-    ]);
+    // Single call — searchByUrl using Zillow property URL built from address
+    // This is the most reliable way to get subject property details
+    const zillowUrl='https://www.zillow.com/homes/'+encodedAddr+'_rb/';
+    const searchRes=await fetch(`${BASE}/searchByUrl?url=${encodeURIComponent(zillowUrl)}`,{headers:apiHeaders()});
+    const searchData=await searchRes.json();
 
-    const compsData=await compsRes.json();
-    const valueData=await valueRes.json();
+    console.log('SEARCH KEYS:', Object.keys(searchData));
+    console.log('SEARCH FULL:', JSON.stringify(searchData).slice(0,1000));
 
-    console.log('COMPS TOP KEYS:', Object.keys(compsData));
-    console.log('COMPS zpid:', compsData.zpid, '| subjectZpid:', compsData.subjectZpid);
-    console.log('COMPS full (first 800):', JSON.stringify(compsData).slice(0,800));
+    // Extract from search result
+    const prop=searchData.props?.[0]||searchData.property||searchData||null;
+    const beds=prop?.bedrooms||prop?.beds||null;
+    const bathsRaw=prop?.bathrooms||prop?.baths||null;
+    const sqft=prop?.livingArea||prop?.area||null;
+    const yearBuilt=prop?.yearBuilt||null;
+    const lastSoldPrice=prop?.lastSoldPrice||prop?.price||null;
+    const lastSoldDate=prop?.lastSoldDate||prop?.dateSold||null;
 
-    // Try to get zpid from comps response — API often includes subject zpid
-    const subjectZpid=compsData.zpid||compsData.subjectZpid||compsData.subject?.zpid||null;
-
-    let beds=null,bathsRaw=null,sqft=null,yearBuilt=null,lastSoldPrice=null,lastSoldDate=null;
-
-    if(subjectZpid){
-      // We have a zpid — fetch exact property details
-      const propRes=await fetch(`${BASE}/property?zpid=${subjectZpid}`,{headers:apiHeaders()});
-      const propData=await propRes.json();
-      console.log('PROPERTY DATA:', JSON.stringify(propData).slice(0,600));
-      beds=propData.bedrooms||null;
-      bathsRaw=propData.bathrooms||null;
-      sqft=propData.livingArea||null;
-      yearBuilt=propData.yearBuilt||null;
-      lastSoldPrice=propData.lastSoldPrice||propData.price||null;
-      lastSoldDate=propData.lastSoldDate||propData.dateSold||null;
-    }
-
-    // Value estimate
-    const arvLow=valueData.lowValue||null;
-    const arvMed=valueData.median||null;
-    const arvHigh=valueData.highValue||null;
+    // Stub comps and value — add back once property lookup works
+    const compsData={comps:[]};
+    const arvLow=null, arvMed=null, arvHigh=null;
 
     // --- Auto-fill deal inputs ---
     let filled=[];
