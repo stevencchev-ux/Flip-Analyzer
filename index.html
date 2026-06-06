@@ -31,12 +31,13 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-  header { padding: 1.5rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; }
+  header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; justify-content: space-between; }
   header h1 { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
-  .log-toggle-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 6px 12px; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+  .log-toggle-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 6px 12px; cursor: pointer; }
   .log-toggle-btn:hover { color: var(--accent); border-color: var(--accent-dim); }
 
-  .container { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem; }
+  .container { max-width: 960px; margin: 0 auto; padding: 1.25rem 1.5rem; }
+
   .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
   .card-title { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); margin-bottom: 1.25rem; }
@@ -45,33 +46,26 @@
   .field input, .field select { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; width: 100%; outline: none; transition: border-color 0.15s; -webkit-appearance: none; appearance: none; }
   .field input:focus, .field select:focus { border-color: var(--accent-dim); }
 
-  /* Address lookup */
-  .lookup-card { background: var(--surface); border: 1px solid var(--accent-dim); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; position: relative; }
+  /* Lookup card */
+  .lookup-card { background: var(--surface); border: 1px solid var(--accent-dim); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
   .lookup-card .card-title { color: var(--accent-dim); }
   .lookup-row { display: flex; gap: 10px; align-items: flex-end; }
-  .lookup-row .field { flex: 1; }
+  .lookup-row .field { flex: 1; min-width: 0; }
   .lookup-btn { background: var(--accent); color: #080c14; border: none; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 16px; cursor: pointer; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
   .lookup-btn:hover { background: var(--accent-bright); }
   .lookup-btn:disabled { background: var(--hint); cursor: not-allowed; }
-
   .lookup-status { font-family: var(--font-mono); font-size: 11px; margin-top: 8px; min-height: 16px; }
   .status-loading { color: var(--accent-dim); }
   .status-ok { color: #40c080; }
   .status-err { color: var(--danger); }
   .autofilled { border-color: #40c080 !important; }
 
-  /* Property profile card */
+  /* Profile card */
   #profile-card { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
-  .profile-top { display: grid; grid-template-columns: repeat(5,1fr); gap: 1rem; margin-bottom: 1.25rem; }
-  .profile-stat { display: flex; flex-direction: column; gap: 3px; }
-  .profile-stat .ps-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); }
-  .profile-stat .ps-value { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--text); }
-  .profile-stat .ps-sub { font-size: 11px; color: var(--muted); }
-  .arv-range { display: flex; align-items: baseline; gap: 5px; flex-wrap: wrap; }
-  .arv-low { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-  .arv-med { font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--accent); }
-  .arv-high { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-  .arv-sep { color: var(--hint); font-size: 10px; margin: 0 1px; }
+  .profile-arv-row { display: flex; align-items: baseline; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+  .profile-arv-main { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--accent); }
+  .profile-arv-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hint); }
+  .profile-arv-note { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
   .profile-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 1rem; }
   .comps-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hint); margin-bottom: 10px; }
   .comp-row { display: grid; grid-template-columns: 16px auto 1fr auto; align-items: baseline; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
@@ -80,9 +74,9 @@
   .comp-badge { font-family: var(--font-mono); font-size: 10px; padding: 2px 7px; border-radius: 3px; border: 1px solid; white-space: nowrap; }
   .cb-sold { background: #0a1a10; color: #40c080; border-color: #1e4030; }
   .cb-other { background: var(--surface2); color: var(--muted); border-color: var(--border2); }
-  .comp-left { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .comp-left { display: flex; align-items: baseline; gap: 8px; min-width: 0; overflow: hidden; }
   .comp-price { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; }
-  .comp-addr { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .comp-addr { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .comp-details { font-family: var(--font-mono); font-size: 11px; color: var(--hint); white-space: nowrap; text-align: right; }
 
   .toggle-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
@@ -138,28 +132,26 @@
   .labor-note strong { color: var(--accent); font-weight: 500; }
 
   .action-bar { display: flex; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
-  .action-bar input { flex: 1; min-width: 180px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.15s; }
-  .action-bar input:focus { border-color: var(--accent-dim); }
+  .action-bar input { flex: 1; min-width: 0; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--font-mono); font-size: 13px; padding: 8px 10px; outline: none; }
   .action-bar input::placeholder { color: var(--hint); }
-  .action-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; white-space: nowrap; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+  .action-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 8px 16px; cursor: pointer; white-space: nowrap; }
   .action-btn.primary { border-color: var(--accent-dim); color: var(--accent); }
   .action-btn.primary:hover { background: var(--accent-dim); color: #fff; }
   .action-btn.share:hover { border-color: var(--accent-dim); color: var(--accent); }
 
   #log-panel { display: none; border-top: 1px solid var(--border); background: var(--surface); }
   #log-panel.open { display: block; }
-  .log-inner { max-width: 960px; margin: 0 auto; padding: 1.5rem 2rem; }
-  .log-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-  .log-header-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); }
-  #log-empty { font-size: 13px; color: var(--hint); font-family: var(--font-mono); padding: 1rem 0; }
+  .log-inner { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+  .log-header-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); margin-bottom: 1rem; }
+  #log-empty { font-size: 13px; color: var(--hint); font-family: var(--font-mono); padding: 0.5rem 0; }
   .log-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .log-table th { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-  .log-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .log-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .log-table tr:last-child td { border-bottom: none; }
   .log-table tr:hover td { background: var(--surface2); }
   .log-address { font-weight: 500; color: var(--text); }
   .log-meta { font-family: var(--font-mono); font-size: 11px; color: var(--hint); margin-top: 2px; }
-  .log-val { font-family: var(--font-mono); font-size: 12px; color: var(--text); }
+  .log-val { font-family: var(--font-mono); font-size: 12px; }
   .log-pos { color: var(--accent); }
   .log-neg { color: var(--danger); }
   .log-grade { font-family: var(--font-mono); font-size: 12px; font-weight: 500; display: inline-block; padding: 2px 8px; border-radius: 3px; border: 1px solid; }
@@ -167,19 +159,21 @@
   .lg-B { background: var(--grade-b-bg); color: var(--grade-b); border-color: var(--grade-b); }
   .lg-C { background: var(--grade-c-bg); color: var(--grade-c); border-color: var(--grade-c); }
   .lg-D { background: var(--grade-d-bg); color: var(--grade-d); border-color: var(--grade-d); }
-  .log-actions { display: flex; gap: 6px; align-items: center; }
-  .log-icon-btn { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 3px; transition: color 0.15s; line-height: 1; }
+  .log-actions { display: flex; gap: 6px; }
+  .log-icon-btn { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 3px; }
   .log-icon-btn:hover { color: var(--accent); }
   .log-icon-btn.del:hover { color: var(--danger); }
 
   @media (max-width: 680px) {
-    .container, .log-inner { padding: 1rem; }
+    .container { padding: 1rem; }
     header { padding: 1rem; }
     .grid3, .summary-grid, .glance-grid { grid-template-columns: 1fr; }
     .toggle-list { grid-template-columns: 1fr; }
     .action-bar { flex-direction: column; align-items: stretch; }
-    .lookup-row { flex-direction: column; }
-    .profile-top { grid-template-columns: 1fr 1fr; }
+    .lookup-row { flex-direction: column; align-items: stretch; }
+    .lookup-btn { width: 100%; text-align: center; padding: 12px; }
+    .comp-row { grid-template-columns: 16px auto 1fr; }
+    .comp-details { display: none; }
     .log-table th:nth-child(4), .log-table td:nth-child(4),
     .log-table th:nth-child(5), .log-table td:nth-child(5) { display: none; }
   }
@@ -194,16 +188,10 @@
 
 <div id="log-panel">
   <div class="log-inner">
-    <div class="log-header">
-      <div class="log-header-title">Saved deals</div>
-    </div>
+    <div class="log-header-title">Saved deals</div>
     <div id="log-empty">No deals saved yet.</div>
     <table class="log-table" id="log-table" style="display:none">
-      <thead>
-        <tr>
-          <th>Address</th><th>Grade</th><th>Best profit</th><th>Worst profit</th><th>Purchase</th><th>ARV</th><th>Date</th><th></th>
-        </tr>
-      </thead>
+      <thead><tr><th>Address</th><th>Grade</th><th>Best profit</th><th>Worst profit</th><th>Purchase</th><th>ARV</th><th>Date</th><th></th></tr></thead>
       <tbody id="log-tbody"></tbody>
     </table>
   </div>
@@ -211,50 +199,28 @@
 
 <div class="container">
 
-  <!-- ADDRESS LOOKUP -->
-  <div class="lookup-card" id="lookup-card">
-    <div class="card-title">Property lookup — auto-fill from address</div>
+  <div class="lookup-card">
+    <div class="card-title">Property lookup</div>
     <div class="lookup-row">
       <div class="field">
         <label>Property address</label>
-        <input type="text" id="addr-input" placeholder="e.g. 8294 E Carburton St, Long Beach, CA" autocomplete="off" oninput="document.getElementById('lookup-btn').disabled=this.value.trim().length<5">
+        <input type="text" id="addr-input" placeholder="e.g. 8294 E Carburton St, Long Beach, CA 90808" autocomplete="off"
+          oninput="document.getElementById('lookup-btn').disabled=this.value.trim().length<5">
       </div>
       <button class="lookup-btn" id="lookup-btn" onclick="lookupProperty()" disabled>Look up</button>
     </div>
     <div class="lookup-status" id="lookup-status"></div>
   </div>
 
-  <!-- PROPERTY PROFILE -->
   <div id="profile-card">
-    <div class="card-title" id="profile-address-title">Property profile</div>
-    <div class="profile-top">
-      <div class="profile-stat">
-        <span class="ps-label">Beds / Baths</span>
-        <span class="ps-value" id="pp-bedbath">—</span>
-      </div>
-      <div class="profile-stat">
-        <span class="ps-label">Sqft</span>
-        <span class="ps-value" id="pp-sqft">—</span>
-      </div>
-      <div class="profile-stat">
-        <span class="ps-label">Year built</span>
-        <span class="ps-value" id="pp-year">—</span>
-      </div>
-      <div class="profile-stat">
-        <span class="ps-label">Last sold</span>
-        <span class="ps-value" id="pp-lastsold">—</span>
-        <span class="ps-sub" id="pp-lastdate"></span>
-      </div>
-      <div class="profile-stat">
-        <span class="ps-label">ARV estimate</span>
-        <div class="arv-range">
-          <span class="arv-low" id="pp-arv-low">—</span>
-          <span class="arv-sep">›</span>
-          <span class="arv-med" id="pp-arv-med">—</span>
-          <span class="arv-sep">›</span>
-          <span class="arv-high" id="pp-arv-high">—</span>
-        </div>
-        <span class="ps-sub">low · median · high</span>
+    <div style="display:flex;align-items:baseline;gap:1rem;margin-bottom:0.5rem;flex-wrap:wrap">
+      <div class="profile-arv-label" id="profile-address-title">Property</div>
+    </div>
+    <div class="profile-arv-row">
+      <div>
+        <div class="profile-arv-label">Zestimate — ARV starting point</div>
+        <div class="profile-arv-main" id="pp-arv">—</div>
+        <div class="profile-arv-note">Override in deal inputs if needed &nbsp;·&nbsp; see comps below for market context</div>
       </div>
     </div>
     <hr class="profile-divider">
@@ -262,7 +228,6 @@
     <div id="pp-comps"></div>
   </div>
 
-  <!-- DEAL INPUTS -->
   <div class="card">
     <div class="card-title">Deal inputs</div>
     <div class="grid3" style="margin-bottom:1rem">
@@ -389,258 +354,120 @@ const CREW_BUFFER=3*300*4;
 const C=1.10;
 const LOG_KEY='flip_analyzer_log';
 let lastResult=null;
-
 function fmt(n){return'$'+Math.round(n).toLocaleString()}
 function pct(n){return(Math.round(n*10)/10)+'%'}
 function hrs(h,rate){return(h*C/8)*rate}
 function apiHeaders(){return{'x-rapidapi-key':RAPID_KEY,'x-rapidapi-host':API_HOST}}
+function markFilled(id){const el=document.getElementById(id);if(!el)return;el.classList.add('autofilled');setTimeout(()=>el.classList.remove('autofilled'),3000);}
 
-// --- ADDRESS LOOKUP ---
-function onAddrInput(){
-  const val=document.getElementById('addr-input').value.trim();
-  document.getElementById('lookup-btn').disabled=val.length<5;
-  selectedZpid=null;
-  clearTimeout(suggestTimeout);
-  if(val.length<4){hideSuggestions();return;}
-  suggestTimeout=setTimeout(()=>fetchSuggestions(val),400);
-}
-
-async function fetchSuggestions(q){
-  try{
-    const r=await fetch(`${BASE}/locationSuggestions?q=${encodeURIComponent(q)}`,{headers:apiHeaders()});
-    const d=await r.json();
-    const items=(d.results||[]).filter(x=>x.metaData&&x.metaData.zpid).slice(0,6);
-    if(!items.length){hideSuggestions();return;}
-    const box=document.getElementById('suggestions-box');
-    box.innerHTML=items.map(i=>`<div class="suggestion-item" onclick="selectSuggestion('${i.metaData.zpid}','${(i.display||i.value||'').replace(/'/g,"\\'")}')">
-      ${i.display||i.value||''}
-    </div>`).join('');
-    box.style.display='block';
-  }catch(e){hideSuggestions();}
-}
-
-function selectSuggestion(zpid,label){
-  selectedZpid=zpid;
-  document.getElementById('addr-input').value=label;
-  document.getElementById('lookup-btn').disabled=false;
-  hideSuggestions();
-}
-
-function hideSuggestions(){
-  document.getElementById('suggestions-box').style.display='none';
-}
-
-
-
+// --- LOOKUP ---
 async function lookupProperty(){
   const status=document.getElementById('lookup-status');
   const btn=document.getElementById('lookup-btn');
   const addr=document.getElementById('addr-input').value.trim();
-  btn.disabled=true; btn.textContent='Looking up…';
-  status.textContent='Fetching property data…';
+  btn.disabled=true;btn.textContent='Looking up\u2026';
+  status.textContent='Fetching data\u2026';
   status.className='lookup-status status-loading';
   document.getElementById('profile-card').style.display='none';
 
   try{
-    const encodedAddr=encodeURIComponent(addr);
+    const enc=encodeURIComponent(addr);
 
-    // Step 1 — get zpid via extended search
-    const extRes=await fetch(`${BASE}/propertyExtendedSearch?location=${encodedAddr}&home_type=Houses&beds_min=1`,{headers:apiHeaders()});
-    const extData=await extRes.json();
-    const allProps=Array.isArray(extData)?extData:(extData.props||[]);
-    // Match by street number — case insensitive, works with any address format
-    const streetNum=(addr.trim().match(/^\d+/)||[])[0]||'';
-    const matched=allProps.find(p=>{
-      const a=(p.address||p.streetAddress||'').toLowerCase();
-      return streetNum&&a.includes(streetNum);
-    })||allProps[0]||null;
-    const zpid=matched?.zpid||null;
-
-    // If no zpid just show comps and zestimate without property details
-    if(!zpid){
-      const [compsRes2,zestRes2]=await Promise.all([
-        fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
-        fetch(`${BASE}/zestimate?address=${encodedAddr}`,{headers:apiHeaders()})
-      ]);
-      const cd=await compsRes2.json();
-      const zd=await zestRes2.json();
-      if(zd.value){document.getElementById('arv').value=Math.round(zd.value);markFilled('arv');}
-      document.getElementById('save-address').value=addr;
-      const el=id=>document.getElementById(id);
-      el('profile-address-title').textContent=addr;
-      el('pp-bedbath').textContent='N/A';el('pp-sqft').textContent='N/A';
-      el('pp-year').textContent='N/A';el('pp-lastsold').textContent='N/A';
-      el('pp-lastdate').textContent='';
-      el('pp-arv-low').textContent=zd.value?('$'+Math.round(zd.value*0.95).toLocaleString()):'—';
-      el('pp-arv-med').textContent=zd.value?('$'+Math.round(zd.value).toLocaleString()):'—';
-      el('pp-arv-high').textContent=zd.value?('$'+Math.round(zd.value*1.05).toLocaleString()):'—';
-      const fc=n=>n?('$'+Math.round(n).toLocaleString()):'N/A';
-      const fn=n=>n?Math.round(n).toLocaleString():'N/A';
-      const comps=(cd.comps||[]).slice(0,5);
-      el('pp-comps').innerHTML=comps.length?comps.map((c,i)=>{
-        const st=(c.homeStatus||'').toLowerCase().replace(/_/g,' ');
-        const isSold=st.includes('sold');
-        const sl=st?st.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
-        const sa=(c.address?.streetAddress||'N/A')+(c.address?.city?', '+c.address.city:'');
-        const sf=c.livingArea?fn(c.livingArea)+' sf':'';
-        return `<div class="comp-row"><span class="comp-num">${i+1}</span><span class="comp-badge ${isSold?'cb-sold':'cb-other'}">${sl}</span><span class="comp-left"><span class="comp-price">${fc(c.price)}</span><span class="comp-addr">${sa}</span></span><span class="comp-details">${c.bedrooms||'?'}/${c.bathrooms||'?'}${sf?' · '+sf:''}</span></div>`;
-      }).join(''):'<div style="font-size:13px;color:var(--hint);padding:8px 0">No comps returned.</div>';
-      el('profile-card').style.display='block';
-      status.textContent='ARV auto-filled — property details not found, enter manually.';
-      status.className='lookup-status status-ok';
-      btn.textContent='Look up';btn.disabled=false;
-      return;
-    }
-
-    // Step 2 — fire property details, comps, zestimate in parallel
-    const [propRes, compsRes, zestRes]=await Promise.all([
-      fetch(`${BASE}/property?zpid=${zpid}`,{headers:apiHeaders()}),
-      fetch(`${BASE}/propertyComps?address=${encodedAddr}`,{headers:apiHeaders()}),
-      fetch(`${BASE}/zestimate?address=${encodedAddr}`,{headers:apiHeaders()})
+    // Two calls: comps + zestimate
+    const [compsRes,zestRes]=await Promise.all([
+      fetch(`${BASE}/propertyComps?address=${enc}`,{headers:apiHeaders()}),
+      fetch(`${BASE}/zestimate?address=${enc}`,{headers:apiHeaders()})
     ]);
-    const prop=await propRes.json();
     const compsData=await compsRes.json();
     const zestData=await zestRes.json();
 
-    // Extract property details — direct fields work for normal properties
-    const beds=prop.bedrooms||null;
-    const bathsRaw=prop.bathrooms||null;
-    const sqft=prop.livingArea||null;
-    const yearBuilt=prop.yearBuilt||null;
-    const arvVal=zestData.value||prop.zestimate||null;
-
-    // Last sold from priceHistory
-    const soldEvents=(prop.priceHistory||[]).filter(e=>(e.event||'').toLowerCase()==='sold');
-    const lastSold=soldEvents[0]||null;
-    const lastSoldPrice=lastSold?.price||null;
-    const lastSoldDate=lastSold?.date||null;
-
-    // --- Auto-fill deal inputs ---
-    let filled=[];
-    if(beds){
-      const bedSel=document.getElementById('beds');
-      const opt=[...bedSel.options].find(o=>+o.value===Math.round(beds))||
-        [...bedSel.options].reduce((a,c)=>Math.abs(+c.value-beds)<Math.abs(+a.value-beds)?c:a);
-      if(opt){bedSel.value=opt.value;markFilled('beds');}
-      filled.push('beds');
-    }
-    if(bathsRaw){
-      const b=bathsRaw%1>=0.5?Math.floor(bathsRaw)+0.5:Math.floor(bathsRaw);
-      const bathSel=document.getElementById('baths');
-      const opt=[...bathSel.options].find(o=>+o.value===b)||
-        [...bathSel.options].reduce((a,c)=>Math.abs(+c.value-b)<Math.abs(+a.value-b)?c:a);
-      if(opt){bathSel.value=opt.value;markFilled('baths');}
-      filled.push('baths');
-    }
-    if(sqft){document.getElementById('sqft').value=Math.round(sqft);markFilled('sqft');filled.push('sqft');}
-    if(arvVal){document.getElementById('arv').value=Math.round(arvVal);markFilled('arv');filled.push('ARV');}
+    const arvVal=zestData.value||null;
+    if(arvVal){document.getElementById('arv').value=Math.round(arvVal);markFilled('arv');}
     document.getElementById('save-address').value=addr;
 
-    // --- Populate profile card ---
-    const fc=n=>n?('$'+Math.round(n).toLocaleString()):'N/A';
-    const fn=n=>n?Math.round(n).toLocaleString():'N/A';
     const el=id=>document.getElementById(id);
-
     el('profile-address-title').textContent=addr;
-    el('pp-bedbath').textContent=(beds&&bathsRaw)?(Math.round(beds)+'bd / '+bathsRaw+'ba'):'N/A';
-    el('pp-sqft').textContent=sqft?fn(sqft)+' sqft':'N/A';
-    el('pp-year').textContent=yearBuilt||'N/A';
-    el('pp-lastsold').textContent=lastSoldPrice?fc(lastSoldPrice):'N/A';
-    el('pp-lastdate').textContent=lastSoldDate||'';
-    el('pp-arv-low').textContent=arvVal?fc(Math.round(arvVal*0.95)):'—';
-    el('pp-arv-med').textContent=arvVal?fc(arvVal):'—';
-    el('pp-arv-high').textContent=arvVal?fc(Math.round(arvVal*1.05)):'—';
+    el('pp-arv').textContent=arvVal?fmt(arvVal):'N/A';
 
+    const fc=n=>n?fmt(n):'N/A';
+    const fn=n=>n?Math.round(n).toLocaleString():'N/A';
     const comps=(compsData.comps||[]).slice(0,5);
-    const compsHtml=comps.length?comps.map((c,i)=>{
-      const price=fc(c.price||c.lastSoldPrice);
+    el('pp-comps').innerHTML=comps.length?comps.map((c,i)=>{
       const st=(c.homeStatus||'').toLowerCase().replace(/_/g,' ');
       const isSold=st.includes('sold');
-      const statusLabel=st?st.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
+      const sl=st?st.split(' ').map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' '):'N/A';
       const street=c.address?.streetAddress||'N/A';
       const city=c.address?.city||'';
-      const shortAddr=street+(city?', '+city:'');
+      const sa=street+(city?', '+city:'');
       const bd=c.bedrooms||'?';const ba=c.bathrooms||'?';
       const sf=c.livingArea?fn(c.livingArea)+' sf':'';
       return `<div class="comp-row">
         <span class="comp-num">${i+1}</span>
-        <span class="comp-badge ${isSold?'cb-sold':'cb-other'}">${statusLabel}</span>
-        <span class="comp-left"><span class="comp-price">${price}</span><span class="comp-addr">${shortAddr}</span></span>
-        <span class="comp-details">${bd}/${ba}${sf?' · '+sf:''}</span>
+        <span class="comp-badge ${isSold?'cb-sold':'cb-other'}">${sl}</span>
+        <span class="comp-left"><span class="comp-price">${fc(c.price)}</span><span class="comp-addr">${sa}</span></span>
+        <span class="comp-details">${bd}/${ba}${sf?' \u00b7 '+sf:''}</span>
       </div>`;
     }).join(''):'<div style="font-size:13px;color:var(--hint);padding:8px 0">No comps returned.</div>';
-    el('pp-comps').innerHTML=compsHtml;
-    el('profile-card').style.display='block';
 
-    status.textContent=filled.length
-      ?`Auto-filled: ${filled.join(', ')} — review and adjust before running analysis.`
-      :'Property loaded — fill in details manually.';
+    el('profile-card').style.display='block';
+    status.textContent=arvVal
+      ?'Zestimate loaded \u2014 see comps below for market context. Enter beds, baths & sqft from the wholesaler email.'
+      :'Comps loaded \u2014 enter deal details below.';
     status.className='lookup-status status-ok';
 
   }catch(e){
-    console.error('Lookup error:',e);
-    status.textContent='Lookup failed — check your connection or fill in manually.';
+    status.textContent='Lookup failed \u2014 check connection or enter manually.';
     status.className='lookup-status status-err';
   }
-
-  btn.textContent='Look up'; btn.disabled=false;
-}
-
-function markFilled(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.classList.add('autofilled');
-  setTimeout(()=>el.classList.remove('autofilled'),3000);
+  btn.textContent='Look up';btn.disabled=false;
 }
 
 // --- ENGINE ---
 function calcMaterials(sqft,beds,baths,cab_qty,win_qty,light_qty){
   const fullBaths=Math.floor(baths),doors=beds+Math.ceil(baths)+1,m={};
-  m.lvp=sqft*1.79; m.baseboards=Math.ceil((sqft*0.5)/16)*8.25;
-  m.casings=doors*2*7.90; m.cabinets=cab_qty*425;
-  m.countertop=2000; m.sink=350; m.sink_faucet=150;
-  m.disposal_mat=210; m.range=900; m.range_hood=250; m.fridge=1200;
-  m.vanities=Math.ceil(baths)*425; m.toilets=Math.ceil(baths)*165; m.tubs=fullBaths*550;
-  m.shower_tile_wall=fullBaths*90*3.75; m.bath_floor_tile=fullBaths*45*3.75;
-  m.schluter=fullBaths*25; m.thinset=fullBaths*4*15; m.grout=fullBaths*25;
-  m.spacers=fullBaths*50; m.waterproofing=fullBaths*80;
+  m.lvp=sqft*1.79;m.baseboards=Math.ceil((sqft*0.5)/16)*8.25;
+  m.casings=doors*2*7.90;m.cabinets=cab_qty*425;
+  m.countertop=2000;m.sink=350;m.sink_faucet=150;
+  m.disposal_mat=210;m.range=900;m.range_hood=250;m.fridge=1200;
+  m.vanities=Math.ceil(baths)*425;m.toilets=Math.ceil(baths)*165;m.tubs=fullBaths*550;
+  m.shower_tile_wall=fullBaths*90*3.75;m.bath_floor_tile=fullBaths*45*3.75;
+  m.schluter=fullBaths*25;m.thinset=fullBaths*4*15;m.grout=fullBaths*25;
+  m.spacers=fullBaths*50;m.waterproofing=fullBaths*80;
   m.backer_board=fullBaths*Math.ceil(90/32)*17.50;
-  m.shower_doors=fullBaths*300; m.vanity_lights=Math.ceil(baths)*40;
-  m.shower_trim=fullBaths*50; m.shower_valves=fullBaths*100;
-  m.ptrap=Math.ceil(baths)*40; m.bath_faucet=Math.ceil(baths)*30; m.towel_bar=Math.ceil(baths)*25;
+  m.shower_doors=fullBaths*300;m.vanity_lights=Math.ceil(baths)*40;
+  m.shower_trim=fullBaths*50;m.shower_valves=fullBaths*100;
+  m.ptrap=Math.ceil(baths)*40;m.bath_faucet=Math.ceil(baths)*30;m.towel_bar=Math.ceil(baths)*25;
   const rr=Math.ceil(light_qty/8);
-  m.romex=rr*85; m.lights=Math.ceil(light_qty/16)*73;
+  m.romex=rr*85;m.lights=Math.ceil(light_qty/16)*73;
   m.gfci=Math.ceil((Math.ceil(baths)+2)/4)*56;
   m.outlets=Math.ceil((sqft/100)*0.5)*20;
   m.switches=Math.ceil(doors*0.6)*22;
   m.faceplates=Math.ceil((Math.ceil(baths)*2+doors)*1.5/10)*8;
   m.smoke=(beds+Math.ceil(baths)+2)*54;
   m.paint=Math.ceil(sqft/1000)*168;
-  m.doors=doors*100; m.door_hw=Math.ceil(doors/30)*25; m.cab_hw=Math.ceil(cab_qty*2/30)*25;
-  m.consumables=sqft*0.175; m.supply=(Math.ceil(baths)+1)*25;
+  m.doors=doors*100;m.door_hw=Math.ceil(doors/30)*25;m.cab_hw=Math.ceil(cab_qty*2/30)*25;
+  m.consumables=sqft*0.175;m.supply=(Math.ceil(baths)+1)*25;
   return Object.values(m).reduce((a,b)=>a+b,0)*TAX;
 }
-
 function calcLabor(sqft,beds,baths,cab_qty,win_qty,light_qty){
   const fullBaths=Math.floor(baths),cb=Math.ceil(baths),doors=beds+cb+1,rr=Math.ceil(light_qty/8);
   let l=0;
-  l+=rB+rC+rD+rE; l+=(rB+rC)*(3*C); l+=250; l+=(rB+rC)*1;
-  l+=hrs(doors*(20/60),rB); l+=(rB+rC)*(1.5*C);
-  l+=hrs(win_qty*2,rB); l+=hrs(cb*(30/60),rB); l+=hrs(cb*(35/60),rB);
-  l+=hrs(fullBaths*2.5,rB); l+=rA*(fullBaths*2*C); l+=rA*(fullBaths*0.5*C);
-  l+=fullBaths*300; l+=hrs(cb*3.5,rB); l+=hrs(cb*(45/60),rB);
-  l+=hrs(rr*2,rB); l+=hrs(rr*1,rB); l+=hrs(light_qty*(2.5/60),rB);
-  l+=hrs(2.5,rB); l+=(rB+rC)*hrs(doors*1.25,1); l+=(rB+rC)*(2*C); l+=3.5*660;
+  l+=rB+rC+rD+rE;l+=(rB+rC)*(3*C);l+=250;l+=(rB+rC)*1;
+  l+=hrs(doors*(20/60),rB);l+=(rB+rC)*(1.5*C);
+  l+=hrs(win_qty*2,rB);l+=hrs(cb*(30/60),rB);l+=hrs(cb*(35/60),rB);
+  l+=hrs(fullBaths*2.5,rB);l+=rA*(fullBaths*2*C);l+=rA*(fullBaths*0.5*C);
+  l+=fullBaths*300;l+=hrs(cb*3.5,rB);l+=hrs(cb*(45/60),rB);
+  l+=hrs(rr*2,rB);l+=hrs(rr*1,rB);l+=hrs(light_qty*(2.5/60),rB);
+  l+=hrs(2.5,rB);l+=(rB+rC)*hrs(doors*1.25,1);l+=(rB+rC)*(2*C);l+=3.5*660;
   return l;
 }
-
 function calcOpt(beds,baths,sqft,win_qty){
   const fullBaths=Math.floor(baths),cb=Math.ceil(baths);
   let mt=0,lab=0,sub=0;
-  if(document.getElementById('opt_roof').checked) sub+=13000;
-  if(document.getElementById('opt_hvac').checked) sub+=11900;
-  if(document.getElementById('opt_panel').checked) sub+=7000;
-  if(document.getElementById('opt_garage').checked) sub+=2500;
+  if(document.getElementById('opt_roof').checked)sub+=13000;
+  if(document.getElementById('opt_hvac').checked)sub+=11900;
+  if(document.getElementById('opt_panel').checked)sub+=7000;
+  if(document.getElementById('opt_garage').checked)sub+=2500;
   if(document.getElementById('opt_wh').checked){mt+=900;lab+=400;}
   if(document.getElementById('opt_fdoor').checked){mt+=500;lab+=rB*1*C;}
   if(document.getElementById('opt_fans').checked){mt+=cb*65;lab+=hrs(cb*2,rB);}
@@ -665,22 +492,22 @@ function analyze(){
   const mb=calcMaterials(sqft,beds,baths,cab_qty,win_qty,light_qty);
   const lb=calcLabor(sqft,beds,baths,cab_qty,win_qty,light_qty);
   const base_pre=mb+lb+CREW_BUFFER+DISPOSAL;
-  const bc=base_pre*0.12; const base_reno=base_pre+bc;
+  const bc=base_pre*0.12;const base_reno=base_pre+bc;
   const opt=calcOpt(beds,baths,sqft,win_qty);
   const full_pre=base_pre+opt.mat+opt.lab+opt.sub;
-  const fc=full_pre*0.15; const full_reno=full_pre+fc;
+  const fc2=full_pre*0.15;const full_reno=full_pre+fc2;
   const carry=(purchase*0.012/12)*holdMonths+200*holdMonths+175*holdMonths;
-  const cb2=purchase*0.015; const cs=arv*SELL_PCT;
+  const cb2=purchase*0.015;const cs=arv*SELL_PCT;
   const b_out=purchase+cb2+base_reno+carry+cs;
   const f_out=purchase+cb2+full_reno+carry+cs;
-  const bp=arv-b_out; const fp=arv-f_out;
+  const bp=arv-b_out;const fp=arv-f_out;
   const inv=purchase+cb2+base_reno+carry;
   const roi=(bp/inv)*100;
 
   let grade,basis;
-  if(fp>=70000){grade='A';basis='Worst case clears $70K — strong buy candidate';}
-  else if(fp>=50000){grade='B';basis='Worst case $50K–$69K — worth a walkthrough';}
-  else if(bp>=50000){grade='C';basis='Only pencils on base scope — inspect before pursuing';}
+  if(fp>=70000){grade='A';basis='Worst case clears $70K \u2014 strong buy candidate';}
+  else if(fp>=50000){grade='B';basis='Worst case $50K\u2013$69K \u2014 worth a walkthrough';}
+  else if(bp>=50000){grade='C';basis='Only pencils on base scope \u2014 inspect before pursuing';}
   else{grade='D';basis='Does not hit $50K under any scenario';}
 
   const flags=[];
@@ -692,33 +519,32 @@ function analyze(){
 
   lastResult={purchase,arv,sqft,beds,baths,grade,bp,fp,inv,roi,
     market:document.getElementById('market').value,holdWeeks,
-    mb,lb,base_reno,full_reno,carry,opt_mat:mb+opt.mat,opt_lab:lb+opt.lab,opt_sub:opt.sub};
+    base_reno,full_reno,carry};
 
   const el=id=>document.getElementById(id);
   el('results').style.display='block';
-  const badge=el('grade_badge');
-  badge.textContent=grade; badge.className='grade-badge grade-'+grade;
+  const badge=el('grade_badge');badge.textContent=grade;badge.className='grade-badge grade-'+grade;
   el('grade_basis').textContent=basis;
-  el('hold_note').textContent=holdWeeks+'-week hold · carry '+fmt(carry);
+  el('hold_note').textContent=holdWeeks+'-week hold \u00b7 carry '+fmt(carry);
   el('flags_container').innerHTML=flags.map(f=>`<span class="flag ${f.cls}">${f.t}</span>`).join('');
-  el('g_best').textContent=fmt(bp); el('g_best').style.color=bp>=0?'var(--accent)':'var(--danger)';
-  el('g_worst').textContent=fmt(fp); el('g_worst').style.color=fp>=0?'var(--accent)':'var(--danger)';
-  el('g_invested').textContent=fmt(inv); el('g_roi').textContent=pct(roi);
-  el('b_purchase').textContent=fmt(purchase); el('b_closing_buy').textContent=fmt(cb2);
-  el('b_acq_sub').textContent=fmt(purchase+cb2); el('b_mat').textContent=fmt(mb);
-  el('b_lab').textContent=fmt(lb); el('b_crew').textContent=fmt(CREW_BUFFER);
-  el('b_contingency').textContent=fmt(bc); el('b_reno_sub').textContent=fmt(base_reno);
-  el('b_carry').textContent=fmt(carry); el('b_closing_sell').textContent=fmt(cs);
+  el('g_best').textContent=fmt(bp);el('g_best').style.color=bp>=0?'var(--accent)':'var(--danger)';
+  el('g_worst').textContent=fmt(fp);el('g_worst').style.color=fp>=0?'var(--accent)':'var(--danger)';
+  el('g_invested').textContent=fmt(inv);el('g_roi').textContent=pct(roi);
+  el('b_purchase').textContent=fmt(purchase);el('b_closing_buy').textContent=fmt(cb2);
+  el('b_acq_sub').textContent=fmt(purchase+cb2);el('b_mat').textContent=fmt(mb);
+  el('b_lab').textContent=fmt(lb);el('b_crew').textContent=fmt(CREW_BUFFER);
+  el('b_contingency').textContent=fmt(bc);el('b_reno_sub').textContent=fmt(base_reno);
+  el('b_carry').textContent=fmt(carry);el('b_closing_sell').textContent=fmt(cs);
   el('b_total_out').textContent=fmt(b_out);
-  const bpEl=el('b_profit'); bpEl.textContent=fmt(bp); bpEl.className='v '+(bp>=0?'profit-pos':'profit-neg');
-  el('f_purchase').textContent=fmt(purchase); el('f_closing_buy').textContent=fmt(cb2);
-  el('f_acq_sub').textContent=fmt(purchase+cb2); el('f_mat').textContent=fmt(mb+opt.mat);
-  el('f_lab').textContent=fmt(lb+opt.lab); el('f_crew').textContent=fmt(CREW_BUFFER);
-  el('f_subs').textContent=fmt(opt.sub); el('f_contingency').textContent=fmt(fc);
-  el('f_reno_sub').textContent=fmt(full_reno); el('f_carry').textContent=fmt(carry);
-  el('f_closing_sell').textContent=fmt(cs); el('f_total_out').textContent=fmt(f_out);
-  const fpEl=el('f_profit'); fpEl.textContent=fmt(fp); fpEl.className='v '+(fp>=0?'profit-pos':'profit-neg');
-  if(!el('save-address').value) el('save-address').value=document.getElementById('addr-input').value;
+  const bpEl=el('b_profit');bpEl.textContent=fmt(bp);bpEl.className='v '+(bp>=0?'profit-pos':'profit-neg');
+  el('f_purchase').textContent=fmt(purchase);el('f_closing_buy').textContent=fmt(cb2);
+  el('f_acq_sub').textContent=fmt(purchase+cb2);el('f_mat').textContent=fmt(mb+opt.mat);
+  el('f_lab').textContent=fmt(lb+opt.lab);el('f_crew').textContent=fmt(CREW_BUFFER);
+  el('f_subs').textContent=fmt(opt.sub);el('f_contingency').textContent=fmt(fc2);
+  el('f_reno_sub').textContent=fmt(full_reno);el('f_carry').textContent=fmt(carry);
+  el('f_closing_sell').textContent=fmt(cs);el('f_total_out').textContent=fmt(f_out);
+  const fpEl=el('f_profit');fpEl.textContent=fmt(fp);fpEl.className='v '+(fp>=0?'profit-pos':'profit-neg');
+  if(!el('save-address').value)el('save-address').value=document.getElementById('addr-input').value;
   el('results').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -727,9 +553,9 @@ function shareDeal(){
   if(!lastResult){alert('Run an analysis first.');return;}
   const addr=document.getElementById('save-address').value.trim();
   const r=lastResult;
-  const msg=`DEAL SUMMARY — ${addr||'(no address)'}
-Grade: ${r.grade} · ${r.market} · ${r.sqft.toLocaleString()} sqft · ${r.beds}bd/${r.baths}ba
-Purchase: ${fmt(r.purchase)} · ARV: ${fmt(r.arv)}
+  const msg=`DEAL SUMMARY \u2014 ${addr||'(no address)'}
+Grade: ${r.grade} \u00b7 ${r.market} \u00b7 ${r.sqft.toLocaleString()} sqft \u00b7 ${r.beds}bd/${r.baths}ba
+Purchase: ${fmt(r.purchase)} \u00b7 ARV: ${fmt(r.arv)}
 
 BASE SCOPE
   Renovation: ${fmt(r.base_reno)}
@@ -739,7 +565,7 @@ FULL SCOPE (worst case)
   Renovation: ${fmt(r.full_reno)}
   Worst profit: ${fmt(r.fp)}
 
-All-in invested: ${fmt(r.inv)} · ROI: ${pct(r.roi)} · Hold: ${r.holdWeeks} wks
+All-in invested: ${fmt(r.inv)} \u00b7 ROI: ${pct(r.roi)} \u00b7 Hold: ${r.holdWeeks} wks
 
 Analyzed via Fix & Flip Engine`;
   window.location.href=`sms:?body=${encodeURIComponent(msg)}`;
@@ -748,7 +574,6 @@ Analyzed via Fix & Flip Engine`;
 // --- DEAL LOG ---
 function getLog(){try{return JSON.parse(localStorage.getItem(LOG_KEY))||[];}catch(e){return[];}}
 function saveLog(log){try{localStorage.setItem(LOG_KEY,JSON.stringify(log));}catch(e){}}
-
 function saveDeal(){
   if(!lastResult){alert('Run an analysis first.');return;}
   const addr=document.getElementById('save-address').value.trim();
@@ -757,36 +582,32 @@ function saveDeal(){
   log.unshift({id:Date.now(),address:addr,grade:lastResult.grade,bp:lastResult.bp,fp:lastResult.fp,
     purchase:lastResult.purchase,arv:lastResult.arv,sqft:lastResult.sqft,
     market:lastResult.market,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})});
-  saveLog(log);
-  document.getElementById('save-address').value='';
-  renderLog(); updateLogCount();
+  saveLog(log);document.getElementById('save-address').value='';
+  renderLog();updateLogCount();
   if(!document.getElementById('log-panel').classList.contains('open'))
     document.getElementById('log-panel').classList.add('open');
 }
-
 function shareLogDeal(id){
-  const d=getLog().find(x=>x.id===id); if(!d)return;
-  const msg=`DEAL SUMMARY — ${d.address}
-Grade: ${d.grade} · ${d.market} · ${d.sqft.toLocaleString()} sqft
-Purchase: ${fmt(d.purchase)} · ARV: ${fmt(d.arv)}
-Best profit: ${fmt(d.bp)} · Worst profit: ${fmt(d.fp)}
+  const d=getLog().find(x=>x.id===id);if(!d)return;
+  const msg=`DEAL SUMMARY \u2014 ${d.address}
+Grade: ${d.grade} \u00b7 ${d.market} \u00b7 ${d.sqft.toLocaleString()} sqft
+Purchase: ${fmt(d.purchase)} \u00b7 ARV: ${fmt(d.arv)}
+Best profit: ${fmt(d.bp)} \u00b7 Worst profit: ${fmt(d.fp)}
 Saved: ${d.date}
 
 Analyzed via Fix & Flip Engine`;
   window.location.href=`sms:?body=${encodeURIComponent(msg)}`;
 }
-
 function deleteDeal(id){saveLog(getLog().filter(d=>d.id!==id));renderLog();updateLogCount();}
-
 function renderLog(){
   const log=getLog();
   const empty=document.getElementById('log-empty');
   const table=document.getElementById('log-table');
   const tbody=document.getElementById('log-tbody');
   if(!log.length){empty.style.display='block';table.style.display='none';return;}
-  empty.style.display='none'; table.style.display='table';
+  empty.style.display='none';table.style.display='table';
   tbody.innerHTML=log.map(d=>`<tr>
-    <td><div class="log-address">${d.address}</div><div class="log-meta">${d.market} · ${d.sqft.toLocaleString()} sqft</div></td>
+    <td><div class="log-address">${d.address}</div><div class="log-meta">${d.market} \u00b7 ${d.sqft.toLocaleString()} sqft</div></td>
     <td><span class="log-grade lg-${d.grade}">${d.grade}</span></td>
     <td class="log-val ${d.bp>=0?'log-pos':'log-neg'}">${fmt(d.bp)}</td>
     <td class="log-val ${d.fp>=0?'log-pos':'log-neg'}">${fmt(d.fp)}</td>
@@ -794,15 +615,14 @@ function renderLog(){
     <td class="log-val">${fmt(d.arv)}</td>
     <td class="log-meta">${d.date}</td>
     <td><div class="log-actions">
-      <button class="log-icon-btn" onclick="shareLogDeal(${d.id})" title="Share via SMS">&#8599;</button>
+      <button class="log-icon-btn" onclick="shareLogDeal(${d.id})" title="Share">&#8599;</button>
       <button class="log-icon-btn del" onclick="deleteDeal(${d.id})" title="Remove">&#215;</button>
     </div></td>
   </tr>`).join('');
 }
-
 function toggleLog(){document.getElementById('log-panel').classList.toggle('open');}
 function updateLogCount(){const n=getLog().length;document.getElementById('log-count').textContent=n?`(${n})`:''; }
-renderLog(); updateLogCount();
+renderLog();updateLogCount();
 </script>
 </body>
 </html>
