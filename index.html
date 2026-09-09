@@ -155,7 +155,7 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" id="submitBtn" onclick="submitDeal()">Submit for Analysis</button>
+    <button class="btn btn-primary" id="submitBtn">Submit for Analysis</button>
     <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
 
     <div class="status" id="status"></div>
@@ -187,6 +187,9 @@
   }
 
   async function submitDeal() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+
     const address  = document.getElementById('address').value.trim();
     const price    = document.getElementById('price').value.trim();
     const beds     = document.getElementById('beds').value.trim();
@@ -241,17 +244,31 @@ Submitted via SCOLINEMGMT Deal Analyzer`;
         '✓ Deal submitted successfully! The underwriting sheet will arrive in your inbox within 2–3 minutes.',
         'success'
       );
+      isSubmitting = false;
       btn.disabled = false;
 
     } catch(err) {
       setStatus('✗ Failed to submit: ' + (err.text || err.message || 'Unknown error'), 'error');
+      isSubmitting = false;
       btn.disabled = false;
     }
   }
 
+  // Prevent double submit
+  let isSubmitting = false;
+
+  document.getElementById('submitBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (isSubmitting) return;
+    submitDeal();
+  });
+
   // Enter key on address field triggers submit
   document.getElementById('address').addEventListener('keydown', e => {
-    if (e.key === 'Enter') submitDeal();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!isSubmitting) submitDeal();
+    }
   });
 </script>
 </body>
