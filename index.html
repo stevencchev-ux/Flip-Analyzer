@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SCOLINEMGMT — Deal Analyzer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 <style>
   :root {
     --bg: #080c14;
@@ -18,15 +19,10 @@
     --hint: #435070;
     --accent: #4a9eff;
     --accent-dim: #2a6abf;
-    --accent-bright: #80bfff;
     --green: #40c080;
     --green-dim: #1a5035;
     --danger: #f06060;
     --warn: #f0a840;
-    --grade-a: #4a9eff; --grade-a-bg: rgba(74,158,255,0.08);
-    --grade-b: #40c080; --grade-b-bg: rgba(64,192,128,0.08);
-    --grade-c: #f0a840; --grade-c-bg: rgba(240,168,64,0.08);
-    --grade-d: #f06060; --grade-d-bg: rgba(240,96,96,0.08);
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
     --r: 6px;
@@ -34,111 +30,62 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
 
-  /* ── HEADER ── */
   header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; align-items: center; gap: 1rem; }
   header .logo { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
   header .sep { color: var(--hint); }
   header .tagline { font-size: 12px; color: var(--muted); }
 
-  /* ── LAYOUT ── */
-  .wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem; }
-
-  /* ── LOOKUP ── */
-  .lookup-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
-  .lookup-bar input { flex: 1; background: var(--surface); border: 1px solid var(--border2); border-radius: var(--r); color: var(--text); font-family: var(--sans); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color 0.15s; }
-  .lookup-bar input:focus { border-color: var(--accent-dim); }
-  .lookup-bar input::placeholder { color: var(--hint); }
-  .btn { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: var(--r); padding: 10px 18px; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary { background: var(--accent); color: #000; }
-  .btn-primary:hover:not(:disabled) { opacity: 0.85; }
-  .btn-ghost { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); }
-  .btn-ghost:hover:not(:disabled) { color: var(--accent); border-color: var(--accent-dim); }
-  .btn-green { background: var(--green); color: #000; }
-  .btn-green:hover:not(:disabled) { opacity: 0.85; }
-
-  /* ── STATUS ── */
-  .status { font-family: var(--mono); font-size: 11px; color: var(--muted); padding: 0.5rem 0; min-height: 1.5rem; }
-  .status.loading { color: var(--accent); }
-  .status.error { color: var(--danger); }
-  .status.ok { color: var(--green); }
-
-  /* ── PROPERTY CARD ── */
-  .prop-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
-  .prop-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; gap: 1rem; }
-  .prop-address { font-size: 16px; font-weight: 500; color: var(--text); }
-  .prop-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .edit-note { font-family: var(--mono); font-size: 10px; color: var(--hint); font-style: italic; }
-
-  .fields-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-  @media (max-width: 640px) { .fields-grid { grid-template-columns: repeat(2, 1fr); } }
-
-  .field { display: flex; flex-direction: column; gap: 4px; }
-  .field label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); }
-  .field input { background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; color: var(--text); font-family: var(--mono); font-size: 13px; padding: 7px 10px; outline: none; transition: border-color 0.15s; -webkit-appearance: none; }
-  .field input:focus { border-color: var(--accent-dim); }
-  .field input.autofilled { border-color: var(--green-dim); color: var(--green); }
-  .field input.manual { border-color: var(--warn); }
-
-  .actions-row { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
-
-  /* ── GRADE BADGE ── */
-  .grade-badge { font-family: var(--mono); font-size: 22px; font-weight: 500; padding: 6px 16px; border-radius: 4px; letter-spacing: 0.05em; }
-  .grade-A { background: var(--grade-a-bg); color: var(--grade-a); border: 1px solid var(--grade-a); }
-  .grade-B { background: var(--grade-b-bg); color: var(--grade-b); border: 1px solid var(--grade-b); }
-  .grade-C { background: var(--grade-c-bg); color: var(--grade-c); border: 1px solid var(--grade-c); }
-  .grade-D { background: var(--grade-d-bg); color: var(--grade-d); border: 1px solid var(--grade-d); }
-
-  /* ── RESULTS ── */
-  .results { display: none; }
-  .results.visible { display: block; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem; }
 
   .section-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--hint); margin-bottom: 0.75rem; margin-top: 1.5rem; }
 
-  /* summary strip */
-  .summary-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 1.25rem; }
-  .strip-cell { background: var(--surface); padding: 0.85rem 1rem; }
-  .strip-cell .lbl { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hint); margin-bottom: 4px; }
-  .strip-cell .val { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--text); }
-  .strip-cell .val.green { color: var(--green); }
-  .strip-cell .val.warn { color: var(--warn); }
-  .strip-cell .val.danger { color: var(--danger); }
-  @media (max-width: 640px) { .summary-strip { grid-template-columns: repeat(2, 1fr); } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 1.5rem; margin-bottom: 1.25rem; }
+  .card-title { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 1rem; letter-spacing: 0.05em; }
 
-  /* exit table */
-  .tbl { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 1.25rem; }
-  .tbl th { background: var(--surface2); color: var(--hint); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-  .tbl td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
-  .tbl tr:last-child td { border-bottom: none; }
-  .tbl tr.best td { background: rgba(64,192,128,0.06); }
-  .tbl tr.worst-case td { background: rgba(240,168,64,0.08); color: var(--warn); }
-  .tbl tr.red-row td { background: rgba(240,96,96,0.06); color: var(--danger); }
-  .tbl .right { text-align: right; }
-  .tbl .center { text-align: center; }
+  .fields-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
+  .fields-grid.single { grid-template-columns: 1fr; }
+  @media (max-width: 480px) { .fields-grid { grid-template-columns: 1fr; } }
 
-  /* comps */
-  .comps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
-  @media (max-width: 640px) { .comps-grid { grid-template-columns: 1fr; } }
-  .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 0.85rem 1rem; }
-  .comp-card .comp-addr { font-size: 12px; color: var(--accent); text-decoration: none; display: block; margin-bottom: 6px; line-height: 1.4; }
-  .comp-card .comp-addr:hover { color: var(--accent-bright); }
-  .comp-card .comp-stats { display: flex; gap: 1rem; }
-  .comp-card .comp-stat .lbl { font-family: var(--mono); font-size: 9px; color: var(--hint); letter-spacing: 0.1em; text-transform: uppercase; }
-  .comp-card .comp-stat .val { font-family: var(--mono); font-size: 13px; color: var(--text); }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hint); }
+  .field input, .field textarea, .field select {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    width: 100%;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--accent-dim); }
+  .field textarea { resize: vertical; min-height: 80px; font-family: var(--sans); font-size: 13px; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--hint); }
+  .field.span2 { grid-column: span 2; }
+  @media (max-width: 480px) { .field.span2 { grid-column: span 1; } }
 
-  /* UW preview */
-  .uw-frame { background: #fff; border-radius: var(--r); overflow: hidden; margin-bottom: 1.25rem; border: 1px solid var(--border); }
-  .uw-frame iframe { width: 100%; height: 700px; border: none; display: block; }
+  .btn { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: none; border-radius: var(--r); padding: 11px 20px; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; width: 100%; margin-top: 1rem; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+  .btn-ghost { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); margin-top: 0.5rem; }
+  .btn-ghost:hover:not(:disabled) { color: var(--accent); border-color: var(--accent-dim); }
 
-  /* download bar */
-  .download-bar { display: flex; gap: 0.75rem; align-items: center; padding: 1rem 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); margin-bottom: 1.5rem; }
-  .download-bar .dl-label { font-family: var(--mono); font-size: 11px; color: var(--muted); flex: 1; }
+  .status { font-family: var(--mono); font-size: 11px; padding: 0.75rem 1rem; border-radius: var(--r); margin-top: 1rem; display: none; }
+  .status.show { display: block; }
+  .status.loading { background: rgba(74,158,255,0.08); border: 1px solid var(--accent-dim); color: var(--accent); }
+  .status.success { background: rgba(64,192,128,0.08); border: 1px solid var(--green-dim); color: var(--green); }
+  .status.error { background: rgba(240,96,96,0.08); border: 1px solid #6a2020; color: var(--danger); }
 
-  /* spinner */
+  .info-box { background: rgba(74,158,255,0.05); border: 1px solid var(--border); border-radius: var(--r); padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+  .info-box p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .info-box strong { color: var(--accent); }
+
   @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
-
-  .hidden { display: none !important; }
+  .spinner { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
 </style>
 </head>
 <body>
@@ -146,372 +93,166 @@
 <header>
   <span class="logo">SCOLINEMGMT</span>
   <span class="sep">·</span>
-  <span class="tagline">Deal Underwriting Analyzer</span>
+  <span class="tagline">On-Demand Deal Analyzer</span>
 </header>
 
 <div class="wrap">
 
-  <!-- LOOKUP BAR -->
-  <div class="lookup-bar">
-    <input type="text" id="addressInput" placeholder="Enter property address (e.g. 1524 W 223rd St, Torrance, CA 90501)" />
-    <button class="btn btn-primary" id="lookupBtn" onclick="lookupProperty()">Look up</button>
+  <div class="info-box">
+    <p>Enter the deal details below and hit <strong>Submit for Analysis</strong>. The pipeline will pull comps, run the numbers, and send the full underwriting sheet to your inbox — usually within 2–3 minutes.</p>
   </div>
-  <div class="status" id="lookupStatus"></div>
 
-  <!-- PROPERTY CARD -->
-  <div class="prop-card hidden" id="propCard">
-    <div class="prop-card-header">
-      <div>
-        <div class="prop-address" id="propAddress"></div>
-        <div class="prop-meta" id="propMeta"></div>
-      </div>
-      <div class="edit-note">Fields are editable — correct any autofill errors before analyzing</div>
-    </div>
+  <div class="card">
+    <div class="card-title">Property Details</div>
     <div class="fields-grid">
-      <div class="field"><label>Purchase Price ($)</label><input type="number" id="fPrice" placeholder="e.g. 660000" /></div>
-      <div class="field"><label>Beds</label><input type="number" id="fBeds" placeholder="3" /></div>
-      <div class="field"><label>Baths</label><input type="number" id="fBaths" placeholder="2" step="0.5" /></div>
-      <div class="field"><label>Sqft</label><input type="number" id="fSqft" placeholder="1152" /></div>
-      <div class="field"><label>Year Built</label><input type="number" id="fYear" placeholder="1947" /></div>
-      <div class="field"><label>Lot Size (sqft)</label><input type="number" id="fLot" placeholder="6680" /></div>
-      <div class="field"><label>Wholesaler ARV ($)</label><input type="number" id="fWsArv" placeholder="optional" /></div>
-      <div class="field"><label>Vendor</label><input type="text" id="fVendor" placeholder="e.g. Acquired" /></div>
+      <div class="field span2">
+        <label>Property Address *</label>
+        <input type="text" id="address" placeholder="e.g. 2002 N Studebaker Rd, Long Beach, CA 90815" />
+      </div>
+      <div class="field">
+        <label>Purchase Price ($) *</label>
+        <input type="number" id="price" placeholder="829000" />
+      </div>
+      <div class="field">
+        <label>Wholesaler ARV ($)</label>
+        <input type="number" id="wsArv" placeholder="optional" />
+      </div>
+      <div class="field">
+        <label>Beds *</label>
+        <input type="number" id="beds" placeholder="3" />
+      </div>
+      <div class="field">
+        <label>Baths *</label>
+        <input type="number" id="baths" placeholder="2" step="0.5" />
+      </div>
+      <div class="field">
+        <label>Sqft *</label>
+        <input type="number" id="sqft" placeholder="1169" />
+      </div>
+      <div class="field">
+        <label>Year Built</label>
+        <input type="number" id="yearBuilt" placeholder="1953" />
+      </div>
+      <div class="field">
+        <label>Lot Size (sqft)</label>
+        <input type="number" id="lotSize" placeholder="6680" />
+      </div>
+      <div class="field">
+        <label>COE Date</label>
+        <input type="text" id="coe" placeholder="e.g. 09/17/2026" />
+      </div>
+      <div class="field">
+        <label>EMD ($)</label>
+        <input type="number" id="emd" placeholder="40000" />
+      </div>
+      <div class="field">
+        <label>Vendor / Source</label>
+        <input type="text" id="vendor" placeholder="e.g. Acquired, Direct, Text" />
+      </div>
+      <div class="field span2">
+        <label>Notes (condition, pool, garage, etc.)</label>
+        <textarea id="notes" placeholder="e.g. Cosmetic fixer, pool, 2-car garage, corner lot..."></textarea>
+      </div>
     </div>
-    <div class="actions-row">
-      <button class="btn btn-primary" id="analyzeBtn" onclick="runAnalysis()">Generate UW</button>
-      <button class="btn btn-ghost" onclick="resetAll()">Clear</button>
-    </div>
+
+    <button class="btn btn-primary" id="submitBtn" onclick="submitDeal()">Submit for Analysis</button>
+    <button class="btn btn-ghost" onclick="clearForm()">Clear</button>
+
+    <div class="status" id="status"></div>
   </div>
 
-  <div class="status" id="analyzeStatus"></div>
-
-  <!-- RESULTS -->
-  <div class="results" id="results">
-
-    <div class="section-label">Deal Summary</div>
-    <div class="summary-strip">
-      <div class="strip-cell"><div class="lbl">Grade</div><div class="val" id="rGrade">—</div></div>
-      <div class="strip-cell"><div class="lbl">ARV</div><div class="val" id="rArv">—</div></div>
-      <div class="strip-cell"><div class="lbl">Base Rehab</div><div class="val" id="rBaseRehab">—</div></div>
-      <div class="strip-cell"><div class="lbl">Full Rehab</div><div class="val" id="rFullRehab">—</div></div>
-      <div class="strip-cell"><div class="lbl">Best Profit</div><div class="val" id="rBestProfit">—</div></div>
-    </div>
-
-    <div class="section-label">Exit Scenarios</div>
-    <table class="tbl" id="exitTable">
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th class="right">Sale Price</th>
-          <th class="right">3% + Close</th>
-          <th class="right">Net Profit</th>
-          <th class="center">% of ARV</th>
-        </tr>
-      </thead>
-      <tbody id="exitBody"></tbody>
-    </table>
-
-    <div class="section-label" id="compsLabel">Comparable Sales</div>
-    <div class="comps-grid" id="compsGrid"></div>
-
-    <div class="section-label">Underwriting Sheet</div>
-    <div class="download-bar">
-      <span class="dl-label" id="dlLabel">Underwriting sheet ready</span>
-      <button class="btn btn-green" id="downloadBtn" onclick="downloadUW()">Download UW Sheet</button>
-    </div>
-    <div class="uw-frame">
-      <iframe id="uwFrame" srcdoc=""></iframe>
-    </div>
-
-  </div>
 </div>
 
 <script>
-const RAPIDAPI_KEY  = '8cfc470924msh4a48e105e7c73c3p19ca5bjsn23291dc31f34';
-const ANTHROPIC_KEY = 'sk-ant-api03-WgRwZ7mWqLBX6fDLhRAXBmhRqbM_4yZLJjMQBMGLzfREbE7kzMWqGkq9lrkl2B4oiQf8Z6j5HnRoXgOKg_aYyA-ASGHYgAA';
-const CALCDEAL_URL  = 'https://deal-pipeline-functions-hafrfzgaaddgbtbf.westus2-01.azurewebsites.net/api/CalcDeal?code=WBMMYMDhXhoBVZYJxNTNB8-xewsV3IkHEK_BGzRhk3_nAzFuKOk9SA==';
+  // EmailJS config — fill in your EmailJS public key, service ID, and template ID
+  const EMAILJS_PUBLIC_KEY  = '4bl22ITTNQ4zUgFFA';
+  const EMAILJS_SERVICE_ID  = 'service_59gejpr';
+  const EMAILJS_TEMPLATE_ID = 'ppx5s1l';
+  const TARGET_EMAIL        = 'STEVENCHEV@SCOLINEMGMT.onmicrosoft.com';
 
-let uwHtml = '';
-let currentAddress = '';
-let pulledComps = [];
+  emailjs.init(EMAILJS_PUBLIC_KEY);
 
-function setStatus(id, msg, type='') {
-  const el = document.getElementById(id);
-  el.className = 'status ' + type;
-  el.innerHTML = msg;
-}
+  function setStatus(msg, type) {
+    const el = document.getElementById('status');
+    el.className = 'status show ' + type;
+    el.innerHTML = msg;
+  }
 
-function fmt(n) {
-  if (n == null || isNaN(n)) return 'N/A';
-  return '$' + Math.round(n).toLocaleString();
-}
+  function clearForm() {
+    ['address','price','wsArv','beds','baths','sqft','yearBuilt','lotSize','coe','emd','vendor','notes']
+      .forEach(id => document.getElementById(id).value = '');
+    const el = document.getElementById('status');
+    el.className = 'status';
+    el.innerHTML = '';
+  }
 
-function fmtPct(profit, sale) {
-  if (!sale) return 'N/A';
-  return (profit / sale * 100).toFixed(2) + '%';
-}
+  async function submitDeal() {
+    const address  = document.getElementById('address').value.trim();
+    const price    = document.getElementById('price').value.trim();
+    const beds     = document.getElementById('beds').value.trim();
+    const baths    = document.getElementById('baths').value.trim();
+    const sqft     = document.getElementById('sqft').value.trim();
+    const wsArv    = document.getElementById('wsArv').value.trim();
+    const yearBuilt= document.getElementById('yearBuilt').value.trim();
+    const lotSize  = document.getElementById('lotSize').value.trim();
+    const coe      = document.getElementById('coe').value.trim();
+    const emd      = document.getElementById('emd').value.trim();
+    const vendor   = document.getElementById('vendor').value.trim() || 'Direct';
+    const notes    = document.getElementById('notes').value.trim();
 
-function resetAll() {
-  document.getElementById('propCard').classList.add('hidden');
-  document.getElementById('results').classList.remove('visible');
-  document.getElementById('addressInput').value = '';
-  setStatus('lookupStatus', '');
-  setStatus('analyzeStatus', '');
-  uwHtml = '';
-  pulledComps = [];
-}
-
-async function lookupProperty() {
-  const addr = document.getElementById('addressInput').value.trim();
-  if (!addr) return;
-  currentAddress = addr;
-
-  const btn = document.getElementById('lookupBtn');
-  btn.disabled = true;
-  setStatus('lookupStatus', '<span class="spinner"></span>Looking up property...', 'loading');
-  document.getElementById('results').classList.remove('visible');
-
-  try {
-    // Zestimate lookup
-    const zUrl = `https://zillow-com1.p.rapidapi.com/propertyExtendedSearch?location=${encodeURIComponent(addr)}&home_type=Houses`;
-    const zRes = await fetch(zUrl, { headers: { 'x-rapidapi-key': RAPIDAPI_KEY, 'x-rapidapi-host': 'zillow-com1.p.rapidapi.com' }});
-    const zData = await zRes.json();
-
-    let beds = '', baths = '', sqft = '', year = '', lot = '';
-    if (zData.props && zData.props.length > 0) {
-      const p = zData.props[0];
-      beds  = p.bedrooms || '';
-      baths = p.bathrooms || '';
-      sqft  = p.livingArea || '';
-      year  = p.yearBuilt || '';
-      lot   = p.lotAreaValue || '';
+    if (!address || !price || !beds || !baths || !sqft) {
+      setStatus('⚠ Please fill in address, purchase price, beds, baths, and sqft.', 'error');
+      return;
     }
 
-    // Pull comps
-    setStatus('lookupStatus', '<span class="spinner"></span>Pulling comparable sales...', 'loading');
-    const cUrl = `https://zillow-com1.p.rapidapi.com/propertyComps?zpid=${zData.props?.[0]?.zpid || ''}&address=${encodeURIComponent(addr)}`;
-    const cRes = await fetch(cUrl, { headers: { 'x-rapidapi-key': RAPIDAPI_KEY, 'x-rapidapi-host': 'zillow-com1.p.rapidapi.com' }});
-    const cData = await cRes.json();
-    pulledComps = cData.comps || cData.results || [];
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    setStatus('<span class="spinner"></span>Submitting deal for analysis...', 'loading');
 
-    // Populate fields
-    const set = (id, val, autofilled=true) => {
-      const el = document.getElementById(id);
-      el.value = val || '';
-      el.className = val ? (autofilled ? 'autofilled' : '') : '';
-    };
-    set('fBeds', beds); set('fBaths', baths);
-    set('fSqft', sqft); set('fYear', year); set('fLot', lot);
+    // Build email body that Claude extract prompt can parse
+    const emailBody = `New Deal Analysis Request
 
-    document.getElementById('propAddress').textContent = addr;
-    document.getElementById('propMeta').textContent =
-      [beds && `${beds} bed`, baths && `${baths} bath`, sqft && `${Number(sqft).toLocaleString()} sqft`, year && `Built ${year}`].filter(Boolean).join('  ·  ');
+Address: ${address}
+Purchase Price: $${Number(price).toLocaleString()}
+Beds: ${beds}
+Baths: ${baths}
+Square Feet: ${sqft}
+Year Built: ${yearBuilt || 'Unknown'}
+Lot Size: ${lotSize ? lotSize + ' sqft' : 'Unknown'}
+${wsArv ? 'Projected ARV: $' + Number(wsArv).toLocaleString() : ''}
+${coe ? 'COE: ' + coe : ''}
+${emd ? 'EMD: $' + Number(emd).toLocaleString() : ''}
+Vendor: ${vendor}
+${notes ? 'Notes: ' + notes : ''}
 
-    document.getElementById('propCard').classList.remove('hidden');
-    setStatus('lookupStatus', `✓ Property found — ${pulledComps.length} comps pulled. Review fields and set purchase price.`, 'ok');
-  } catch(e) {
-    setStatus('lookupStatus', '⚠ Lookup failed — enter property details manually below.', 'error');
-    document.getElementById('propAddress').textContent = addr;
-    document.getElementById('propCard').classList.remove('hidden');
-  }
-  btn.disabled = false;
-}
+Submitted via SCOLINEMGMT Deal Analyzer`;
 
-async function runAnalysis() {
-  const price  = parseFloat(document.getElementById('fPrice').value);
-  const beds   = parseInt(document.getElementById('fBeds').value);
-  const baths  = parseFloat(document.getElementById('fBaths').value);
-  const sqft   = parseFloat(document.getElementById('fSqft').value);
-  const year   = parseInt(document.getElementById('fYear').value) || 1970;
-  const wsArv  = parseFloat(document.getElementById('fWsArv').value) || 0;
-  const vendor = document.getElementById('fVendor').value || 'Direct';
+    const subject = `Deal Analysis — ${address}`;
 
-  if (!price || !beds || !baths || !sqft) {
-    setStatus('analyzeStatus', '⚠ Please enter purchase price, beds, baths, and sqft.', 'error');
-    return;
-  }
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: TARGET_EMAIL,
+        subject:  subject,
+        message:  emailBody,
+        from_name: 'SCOLINEMGMT Deal Analyzer'
+      });
 
-  const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
-  document.getElementById('results').classList.remove('visible');
+      setStatus(
+        '✓ Deal submitted successfully! The underwriting sheet will arrive in your inbox within 2–3 minutes.',
+        'success'
+      );
+      btn.disabled = false;
 
-  // Step 1 — Pick top 3 comps
-  setStatus('analyzeStatus', '<span class="spinner"></span>Selecting comps...', 'loading');
-  let comp1_price=0, comp2_price=0, comp3_price=0;
-  let comp1_address='', comp2_address='', comp3_address='';
-  let comp1_sqft=0, comp2_sqft=0, comp3_sqft=0;
-
-  const validComps = pulledComps
-    .filter(c => c.price > 0)
-    .sort((a,b) => Math.abs((a.livingArea||0)-sqft) - Math.abs((b.livingArea||0)-sqft))
-    .slice(0,3);
-
-  if (validComps[0]) { comp1_price=validComps[0].price; comp1_address=(validComps[0].address?.streetAddress||'')+(validComps[0].address?.city?', '+validComps[0].address.city:''); comp1_sqft=validComps[0].livingArea||0; }
-  if (validComps[1]) { comp2_price=validComps[1].price; comp2_address=(validComps[1].address?.streetAddress||'')+(validComps[1].address?.city?', '+validComps[1].address.city:''); comp2_sqft=validComps[1].livingArea||0; }
-  if (validComps[2]) { comp3_price=validComps[2].price; comp3_address=(validComps[2].address?.streetAddress||'')+(validComps[2].address?.city?', '+validComps[2].address.city:''); comp3_sqft=validComps[2].livingArea||0; }
-
-  // Step 2 — CalcDeal
-  setStatus('analyzeStatus', '<span class="spinner"></span>Calculating financials...', 'loading');
-  let calc;
-  try {
-    const cRes = await fetch(CALCDEAL_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ price, comp1_price, comp2_price, comp3_price, beds, baths, sqft, year_built: year, arv_wholesaler: wsArv, arv_haircut_pct: 5, ws_arv_haircut_pct: 10, property_negative_pct: 0 })
-    });
-    calc = await cRes.json();
-  } catch(e) {
-    setStatus('analyzeStatus', '✗ CalcDeal error: ' + e.message, 'error');
-    btn.disabled = false; return;
+    } catch(err) {
+      setStatus('✗ Failed to submit: ' + (err.text || err.message || 'Unknown error'), 'error');
+      btn.disabled = false;
+    }
   }
 
-  // Step 3 — Generate UW HTML via Claude
-  setStatus('analyzeStatus', '<span class="spinner"></span>Generating underwriting sheet...', 'loading');
-
-  const payload = {
-    address: currentAddress, price, beds, baths, sqft, vendor,
-    wholesale_fee: calc.wholesale_fee,
-    base_rehab: calc.base_rehab, full_rehab: calc.full_rehab,
-    carry_costs: calc.carry_costs, commission: calc.commission,
-    grade: calc.grade,
-    arv_confidence_tier: validComps.length >= 3 ? 'Strong recent sold comps' : validComps.length >= 1 ? 'Our own comp-supported ARV' : 'No comps available',
-    arv_haircut_pct: calc.capped_haircut_pct || 5,
-    arv_haircut_reason: validComps.length > 0 ? `${validComps.length} comp(s) pulled within area` : 'No comps available — maximum adjustment applied',
-    property_negative: '', property_negative_pct: 0,
-    arv_base: calc.arv_base, arv_conservative: calc.arv_conservative,
-    arv_strong: calc.arv_strong, arv_aggressive: calc.arv_aggressive,
-    floor_price: calc.floor_price, floor_profit: calc.floor_profit,
-    best_profit_base: calc.best_profit_base, best_profit_conservative: calc.best_profit_conservative,
-    best_profit_strong: calc.best_profit_strong, best_profit_aggressive: calc.best_profit_aggressive,
-    worst_profit_base: calc.worst_profit_base,
-    base_pre: calc.base_pre, base_contingency_pct: calc.base_contingency_pct,
-    full_contingency_pct: calc.full_contingency_pct, property_age: calc.property_age,
-    age_adder_pct: calc.age_adder_pct, capped_haircut_pct: calc.capped_haircut_pct,
-    comp_count: calc.comp_count,
-    comp1_address, comp1_price, comp1_sqft,
-    comp2_address: comp2_address||null, comp2_price: comp2_price||null, comp2_sqft: comp2_sqft||null,
-    comp3_address: comp3_address||null, comp3_price: comp3_price||null, comp3_sqft: comp3_sqft||null
-  };
-
-  const UW_PROMPT = await fetch('uw_prompt.txt').then(r=>r.text()).catch(()=>null);
-
-  try {
-    const aRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
-        system: UW_PROMPT || 'Generate a clean HTML underwriting sheet using the data provided. Return raw HTML only starting with <!DOCTYPE html>.',
-        messages: [{ role: 'user', content: 'Generate the underwriting HTML for this deal: ' + JSON.stringify(payload) }]
-      })
-    });
-    const aData = await aRes.json();
-    uwHtml = (aData.content?.[0]?.text || '').replace(/```html/g,'').replace(/```/g,'').replace(/`/g,'');
-  } catch(e) {
-    setStatus('analyzeStatus', '✗ Claude error: ' + e.message, 'error');
-    btn.disabled = false; return;
-  }
-
-  // Render results
-  renderResults(calc, validComps, payload);
-  btn.disabled = false;
-  setStatus('analyzeStatus', '');
-}
-
-function renderResults(calc, comps, payload) {
-  // Summary strip
-  const g = calc.grade || 'D';
-  const gradeEl = document.getElementById('rGrade');
-  gradeEl.textContent = g;
-  gradeEl.className = `val grade-badge grade-${g}`;
-
-  document.getElementById('rArv').textContent = fmt(calc.arv_base);
-  document.getElementById('rBaseRehab').textContent = fmt(calc.base_rehab);
-  document.getElementById('rFullRehab').textContent = fmt(calc.full_rehab);
-  const profEl = document.getElementById('rBestProfit');
-  profEl.textContent = fmt(calc.best_profit_base);
-  profEl.className = 'val ' + (calc.best_profit_base > 0 ? 'green' : 'danger');
-
-  // Exit table
-  const scenarios = [
-    { label: 'Worst Case',   sale: calc.floor_price,     profit: calc.floor_profit,              cls: 'worst-case' },
-    { label: 'Conservative', sale: calc.arv_conservative, profit: calc.best_profit_conservative,  cls: '' },
-    { label: 'Best-Case',    sale: calc.arv_base,         profit: calc.best_profit_base,           cls: 'best' },
-    { label: 'Strong',       sale: calc.arv_strong,       profit: calc.best_profit_strong,         cls: '' },
-    { label: 'Aggressive',   sale: calc.arv_aggressive,   profit: calc.best_profit_aggressive,     cls: '' },
-  ];
-
-  const tbody = document.getElementById('exitBody');
-  tbody.innerHTML = '';
-  scenarios.forEach(s => {
-    const pct = s.sale ? (s.profit / s.sale * 100) : 0;
-    let cls = s.cls;
-    if (!cls && pct < 8) cls = 'red-row';
-    const commClose = s.sale ? Math.round(s.sale * 0.03) + 5000 : 0;
-    const tr = document.createElement('tr');
-    if (cls) tr.className = cls;
-    tr.innerHTML = `
-      <td>${s.label}</td>
-      <td class="right">${fmt(s.sale)}</td>
-      <td class="right">${fmt(commClose)}</td>
-      <td class="right">${fmt(s.profit)}</td>
-      <td class="center">${s.sale ? pct.toFixed(2)+'%' : 'N/A'}</td>`;
-    tbody.appendChild(tr);
+  // Enter key on address field triggers submit
+  document.getElementById('address').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitDeal();
   });
-
-  // Comps
-  const grid = document.getElementById('compsGrid');
-  const label = document.getElementById('compsLabel');
-  grid.innerHTML = '';
-  const dispComps = [
-    { addr: payload.comp1_address, price: payload.comp1_price, sqft: payload.comp1_sqft },
-    { addr: payload.comp2_address, price: payload.comp2_price, sqft: payload.comp2_sqft },
-    { addr: payload.comp3_address, price: payload.comp3_price, sqft: payload.comp3_sqft },
-  ].filter(c => c.addr);
-
-  if (dispComps.length > 0) {
-    label.classList.remove('hidden');
-    grid.classList.remove('hidden');
-    dispComps.forEach(c => {
-      const card = document.createElement('div');
-      card.className = 'comp-card';
-      card.innerHTML = `
-        <a class="comp-addr" href="https://www.google.com/search?q=${encodeURIComponent(c.addr)}" target="_blank">${c.addr}</a>
-        <div class="comp-stats">
-          <div class="comp-stat"><div class="lbl">Price</div><div class="val">${fmt(c.price)}</div></div>
-          <div class="comp-stat"><div class="lbl">Sqft</div><div class="val">${c.sqft ? Number(c.sqft).toLocaleString() : 'N/A'}</div></div>
-        </div>`;
-      grid.appendChild(card);
-    });
-  } else {
-    label.classList.add('hidden');
-    grid.classList.add('hidden');
-  }
-
-  // UW preview
-  document.getElementById('uwFrame').srcdoc = uwHtml;
-  document.getElementById('dlLabel').textContent = `${currentAddress} — Underwriting Sheet`;
-
-  document.getElementById('results').classList.add('visible');
-}
-
-function downloadUW() {
-  if (!uwHtml) return;
-  const blob = new Blob([uwHtml], { type: 'text/html' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  const safe = currentAddress.replace(/[^a-z0-9]/gi, '_').replace(/_+/g,'_');
-  a.href     = url;
-  a.download = `${safe}_UW.html`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// Enter key on address field
-document.getElementById('addressInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') lookupProperty();
-});
 </script>
 </body>
 </html>
